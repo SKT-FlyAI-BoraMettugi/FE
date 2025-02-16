@@ -33,9 +33,14 @@ class _ProblemScreenState extends State<ProblemScreen> {
                   SizedBox(
                     width: 23.w,
                   ),
-                  Icon(
-                    Icons.arrow_back_ios,
-                    size: 24.w,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      size: 24.w,
+                    ),
                   ),
                   SizedBox(
                     width: 299.w,
@@ -51,12 +56,8 @@ class _ProblemScreenState extends State<ProblemScreen> {
               ),
               TabBar(
                 tabs: [
-                  Container(
-                    width: 127.w,
-                    height: 25.h,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFEEEDF1),
-                    ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 4.w),
                     child: Text(
                       "문제",
                       style: TextStyle(
@@ -65,12 +66,8 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       ),
                     ),
                   ),
-                  Container(
-                    width: 127.w,
-                    height: 25.h,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFEEEDF1),
-                    ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 4.w),
                     child: Text(
                       "결과",
                       style: TextStyle(
@@ -79,12 +76,8 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       ),
                     ),
                   ),
-                  Container(
-                    width: 127.w,
-                    height: 25.h,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFEEEDF1),
-                    ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 4.w),
                     child: Text(
                       "토론",
                       style: TextStyle(
@@ -94,16 +87,15 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     ),
                   ),
                 ],
-                indicator: BoxDecoration(
-                  color: Color(0xFF01D4AD),
-                  borderRadius: BorderRadius.circular(100.r),
-                ),
+                indicatorColor: Color(0xFF01D4AD),
                 indicatorWeight: 4,
+                indicatorSize: TabBarIndicatorSize.tab,
               ),
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5.w),
                   child: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
                     children: [
                       SingleChildScrollView(
                         child: Column(
@@ -143,12 +135,21 @@ class _ProblemScreenState extends State<ProblemScreen> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20.r),
                               ),
-                              child: TextField(
-                                maxLines: 10,
-                                keyboardType: TextInputType.multiline,
-                                decoration: InputDecoration(
-                                  hintText: '여기에 텍스트를 입력하세요.',
-                                  border: OutlineInputBorder(),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 3.h,
+                                ),
+                                child: TextField(
+                                  showCursor: true,
+                                  maxLines: 10,
+                                  decoration: InputDecoration(
+                                    hintText: '답변을 작성해주세요.',
+                                    hintStyle: TextStyle(
+                                      fontSize: 17.sp,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
                                 ),
                               ),
                             ),
@@ -269,7 +270,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                                       child: CustomPaint(
                                         size: Size(230.w, 210.h),
                                         painter: StrokePainter(
-                                            score: [8, 7, 9, 7, 8]),
+                                            score: [8, 8, 6, 2, 1]),
                                       ),
                                     ),
                                     Positioned(
@@ -329,6 +330,60 @@ class _ProblemScreenState extends State<ProblemScreen> {
                                     )
                                   ],
                                 ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 35.h,
+                            ),
+                            DefaultTabController(
+                              length: 5,
+                              child: Column(
+                                children: [
+                                  TabBar(
+                                    tabs: [
+                                      Text(
+                                        "창의",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        "논리",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        "사고",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        "설득",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        "깊이",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                    indicatorColor: Color(0xFF6F63E1),
+                                    labelColor: Colors.black,
+                                    unselectedLabelColor: Colors.grey,
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    indicatorWeight: 2,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
