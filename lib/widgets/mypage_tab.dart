@@ -1,3 +1,4 @@
+import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/circle_painter.dart';
@@ -33,9 +34,18 @@ class MyPageTab extends StatelessWidget {
                   SizedBox(
                     width: 299.w,
                   ),
-                  Icon(
-                    Icons.notifications_none,
-                    size: 24.w,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationScreen()),
+                      );
+                    },
+                    child: Icon(
+                      Icons.notifications_none,
+                      size: 24.w,
+                    ),
                   ),
                   SizedBox(
                     height: 34.h,

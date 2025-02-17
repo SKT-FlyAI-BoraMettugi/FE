@@ -1,3 +1,4 @@
+import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/circle_painter.dart';
@@ -39,10 +40,19 @@ class _SpaceThemeState extends State<SpaceTheme> {
                 SizedBox(
                   width: 299.w,
                 ),
-                Icon(
-                  Icons.notifications_none,
-                  size: 24.w,
-                  color: Colors.white,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NotificationScreen()),
+                    );
+                  },
+                  child: Icon(
+                    Icons.notifications_none,
+                    size: 24.w,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
