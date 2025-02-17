@@ -1,6 +1,8 @@
 import 'package:FE/widgets/notification_screen.dart';
+import 'package:FE/widgets/theme_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:math';
 import 'package:FE/widgets/circle_painter.dart';
 import 'package:FE/widgets/problem_screen.dart';
 
@@ -12,6 +14,8 @@ class SpaceTheme extends StatefulWidget {
 }
 
 class _SpaceThemeState extends State<SpaceTheme> {
+  bool isCleared = false;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,7 +61,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
               ],
             ),
             SizedBox(
-              height: 19.h,
+              height: 12.72.h,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -65,9 +69,10 @@ class _SpaceThemeState extends State<SpaceTheme> {
                 Text(
                   "우주 월드",
                   style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white),
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 )
               ],
             ),
@@ -80,27 +85,146 @@ class _SpaceThemeState extends State<SpaceTheme> {
                 width: 383.w,
                 height: 1.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProblemScreen(),
+            Container(
+              width: 393.w,
+              height: 661.h,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 53.h,
+                    left: 54.w,
+                    child: Image.asset(
+                      'assets/theme/earth.png',
+                      width: 55.w,
+                      height: 55.h,
+                    ),
                   ),
-                );
-              },
-              child: CustomPaint(
-                size: Size(60.w, 60.h),
-                painter: CirclePainter(
-                  radius: 30.w,
-                  color: Color(0xFFCCF939).withValues(alpha: 0.3),
-                  centerX: 30.w,
-                  centerY: 30.h,
-                ),
+                  Positioned(
+                    top: 396.h,
+                    left: 223.w,
+                    child: Image.asset(
+                      'assets/theme/falling_star.png',
+                      width: 112.w,
+                      height: 112.h,
+                    ),
+                  ),
+                  Positioned(
+                    top: 661.h,
+                    left: 76.w,
+                    child: Transform.scale(
+                      scale: 2,
+                      child: Transform.rotate(
+                        angle: (360 - 138.31) * pi / 180,
+                        child: Image.asset(
+                          'assets/theme/moon.png',
+                          width: 256.w,
+                          height: 256.h,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 527.h,
+                    left: 72.w,
+                    child: Image.asset(
+                      'assets/theme/telescope.png',
+                      width: 63.w,
+                      height: 63.h,
+                    ),
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 131.w,
+                    ypos: 147.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 206.w,
+                    ypos: 147.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 281.w,
+                    ypos: 147.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 131.w,
+                    ypos: 222.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 206.w,
+                    ypos: 222.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 281.w,
+                    ypos: 222.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 57.w,
+                    ypos: 333.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 132.w,
+                    ypos: 333.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 207.w,
+                    ypos: 333.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 57.w,
+                    ypos: 408.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 132.w,
+                    ypos: 408.h,
+                    isCleared: isCleared,
+                  ),
+                  ThemeButton(
+                    colorCleared: Color(0xFFCCF939),
+                    colorUnCleared: Color(0xFF595F2C),
+                    xpos: 207.w,
+                    ypos: 408.h,
+                    isCleared: isCleared,
+                  ),
+                ],
               ),
             ),
           ],
