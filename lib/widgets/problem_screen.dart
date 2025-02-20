@@ -17,6 +17,16 @@ class _ProblemScreenState extends State<ProblemScreen> {
   final TextEditingController myanswer = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _setImmersiveMode();
+  }
+
+  void _setImmersiveMode() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
   void dispose() {
     myanswer.dispose();
     super.dispose();
@@ -25,16 +35,16 @@ class _ProblemScreenState extends State<ProblemScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-        },
+      home: DefaultTabController(
+        length: 3,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: Color(0xFFEEEDF1),
-          body: DefaultTabController(
-            length: 3,
+          body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+              SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+            },
             child: Column(
               children: [
                 SizedBox(
@@ -235,6 +245,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                                           ],
                                         );
                                       });
+                                  DefaultTabController.of(context).animateTo(1);
                                 },
                                 child: Container(
                                   width: 327.w,

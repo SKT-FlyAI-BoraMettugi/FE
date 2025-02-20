@@ -54,7 +54,8 @@ class _ThemeTabState extends State<ThemeTab> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => NotificationScreen()),
+                              builder: (context) => NotificationScreen(),
+                            ),
                           );
                         },
                         child: Icon(

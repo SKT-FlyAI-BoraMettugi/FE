@@ -38,6 +38,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  // 페이지 이동시에도 bottomnavigationbar 유지
   final List<GlobalKey<NavigatorState>> _navigatorKeys =
       List.generate(5, (index) => GlobalKey<NavigatorState>());
   int _currentIndex = 0;
@@ -51,6 +52,38 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  Future<bool> _onWillPop() async {
+    // 현재 선택된 탭의 Navigator 가져오기
+    final NavigatorState? currentNavigator =
+        _navigatorKeys[_currentIndex].currentState;
+
+    // 현재 탭의 Navigator가 존재하고, 뒤로 갈 페이지가 있으면 pop 실행
+    if (currentNavigator != null && currentNavigator.canPop()) {
+      currentNavigator.pop();
+      return false; // 기본 뒤로 가기 동작을 막음
+    }
+
+    // 첫 번째 페이지인 경우 종료 다이얼로그 표시
+    bool? exitApp = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("앱 종료"),
+        content: const Text("앱을 종료하시겠습니까?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("아니요"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text("예"),
+          ),
+        ],
+      ),
+    );
+    return exitApp ?? false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -60,30 +93,32 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: GestureDetector(
-        onTap: () {
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-        },
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          backgroundColor: Color(0xFFEEEDF1),
-          body: Stack(
-            children: List.generate(5, (index) {
-              return Offstage(
-                offstage: _currentIndex != index,
-                child: Navigator(
-                  key: _navigatorKeys[index],
-                  onGenerateRoute: (routeSettings) {
-                    return MaterialPageRoute(
-                      builder: (context) => _getScreen(index),
-                    );
-                  },
-                ),
-              );
-            }),
-          ),
-          bottomNavigationBar: SafeArea(
-            child: SizedBox(
+      home: WillPopScope(
+        onWillPop: () => _onWillPop(),
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+          },
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            backgroundColor: Color(0xFFEEEDF1),
+            body: Stack(
+              children: List.generate(5, (index) {
+                return Offstage(
+                  offstage: _currentIndex != index,
+                  child: Navigator(
+                    key: _navigatorKeys[index],
+                    onGenerateRoute: (routeSettings) {
+                      return MaterialPageRoute(
+                        builder: (context) => _getScreen(index),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ),
+            bottomNavigationBar: SizedBox(
               height: 74.h,
               child: BottomNavigationBar(
                 backgroundColor: Colors.white,

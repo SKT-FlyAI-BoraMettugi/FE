@@ -1,3 +1,4 @@
+import 'package:FE/widgets/login_screen.dart';
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,7 +33,8 @@ class MyPageTab extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => NotificationScreen()),
+                          builder: (context) => NotificationScreen(),
+                        ),
                       );
                     },
                     child: Icon(
@@ -65,8 +67,8 @@ class MyPageTab extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        left: 6.w,
-                        top: 6.w,
+                        left: 6.h,
+                        top: 6.h,
                         child: Image.asset(
                           'assets/main/rabbit.png',
                           width: 48.h,
@@ -135,27 +137,87 @@ class MyPageTab extends StatelessWidget {
         SizedBox(
           height: 8.h,
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Color(0xFFF9F8FF),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 17.h),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 22.w,
-                ),
-                Text(
-                  "로그아웃",
-                  style: TextStyle(
-                    color: Color(0xFFFF0000),
-                    fontFamily: 'SUITE',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20.h,
+        GestureDetector(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text(
+                      "알림",
+                      style: TextStyle(
+                        fontSize: 20.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    content: Text(
+                      "로그아웃 하실건가요?",
+                      style: TextStyle(
+                        fontSize: 15.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "아니오",
+                          style: TextStyle(
+                            fontSize: 15.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.of(context, rootNavigator: true)
+                              .pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "예",
+                          style: TextStyle(
+                            fontSize: 15.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Color(0xFFF9F8FF),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 17.h),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 22.w,
                   ),
-                )
-              ],
+                  Text(
+                    "로그아웃",
+                    style: TextStyle(
+                      color: Color(0xFFFF0000),
+                      fontFamily: 'SUITE',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20.h,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

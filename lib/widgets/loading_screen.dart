@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'package:FE/widgets/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:FE/main.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       },
     );
