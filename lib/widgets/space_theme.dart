@@ -36,7 +36,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
                     Navigator.pop(context);
                   },
                   child: Icon(
-                    Icons.arrow_back_ios,
+                    Icons.arrow_back_ios_new,
                     size: 24.h,
                     color: Colors.white,
                   ),

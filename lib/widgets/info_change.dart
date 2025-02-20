@@ -33,7 +33,7 @@ class InfoChange extends StatelessWidget {
                           Navigator.pop(context);
                         },
                         child: Icon(
-                          Icons.arrow_back_ios,
+                          Icons.arrow_back_ios_new,
                           size: 24.h,
                         ),
                       ),

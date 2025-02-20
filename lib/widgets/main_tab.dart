@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:FE/widgets/notification_screen.dart';
 import 'package:FE/widgets/ranking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -63,10 +64,18 @@ class MainTab extends StatelessWidget {
             SizedBox(
               width: 281.w - 113.h,
             ),
-            Icon(
-              Icons.notifications_none,
-              color: Colors.black,
-              size: 24.h,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationScreen()),
+                );
+              },
+              child: Icon(
+                Icons.notifications_none,
+                color: Colors.black,
+                size: 24.h,
+              ),
             ),
           ],
         ),
@@ -190,7 +199,7 @@ class MainTab extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 141.w,
+                        width: 164.w - 27.h,
                       ),
                       Text(
                         "1위",
@@ -221,7 +230,7 @@ class MainTab extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 119.w,
+                        width: 164.w - 58.h,
                       ),
                       Text(
                         "781",
@@ -252,7 +261,7 @@ class MainTab extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 106.w,
+                        width: 164.w - 75.h,
                       ),
                       Image.asset(
                         'assets/main/check.png',
@@ -279,7 +288,7 @@ class MainTab extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 77.w,
+                        width: 164.w - 115.h,
                       ),
                       Text(
                         "39",

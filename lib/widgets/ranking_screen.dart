@@ -1,3 +1,4 @@
+import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -36,9 +37,18 @@ class _RankingScreenState extends State<RankingScreen> {
                 SizedBox(
                   width: 323.w - 24.h,
                 ),
-                Icon(
-                  Icons.notifications_none,
-                  size: 24.h,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NotificationScreen()),
+                    );
+                  },
+                  child: Icon(
+                    Icons.notifications_none,
+                    size: 24.h,
+                  ),
                 ),
               ],
             ),

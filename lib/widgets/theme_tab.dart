@@ -1,3 +1,4 @@
+import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/circle_painter.dart';
@@ -34,9 +35,18 @@ class _ThemeTabState extends State<ThemeTab> {
                       SizedBox(
                         width: 346.w,
                       ),
-                      Icon(
-                        Icons.notifications_none,
-                        size: 24.h,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => NotificationScreen()),
+                          );
+                        },
+                        child: Icon(
+                          Icons.notifications_none,
+                          size: 24.h,
+                        ),
                       )
                     ],
                   ),

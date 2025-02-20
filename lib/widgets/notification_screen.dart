@@ -29,8 +29,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     Navigator.pop(context);
                   },
                   child: Icon(
-                    Icons.arrow_back_ios,
-                    size: 24.w,
+                    Icons.arrow_back_ios_new,
+                    size: 24.h,
                   ),
                 ),
               ],
@@ -46,7 +46,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     Text(
                       "알림",
                       style: TextStyle(
-                        fontSize: 20.sp,
+                        fontSize: 20.h,
+                        fontFamily: 'SUITE',
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -70,16 +71,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ],
             ),
             SizedBox(
-              height: 19.h,
+              height: 21.h,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.w),
               child: Container(
                 width: 383.w,
-                height: 632.h,
+                height: 631.h,
                 decoration: BoxDecoration(
                   color: Color(0xFFF9F8FF),
                   borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 17.h,
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 21.w,
+                        ),
+                        Text(
+                          "최근 순 알림",
+                          style: TextStyle(
+                            fontSize: 10.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             )
