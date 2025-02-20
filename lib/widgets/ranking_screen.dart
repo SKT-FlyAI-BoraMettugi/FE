@@ -1,3 +1,4 @@
+import 'package:FE/widgets/circle_painter.dart';
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -101,35 +102,144 @@ class _RankingScreenState extends State<RankingScreen> {
                   SizedBox(
                     height: 16.h,
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 21.w,
+                      ),
+                      Text(
+                        "랭킹",
+                        style: TextStyle(
+                          fontSize: 15.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 118.w - 27.h,
+                      ),
+                      Text(
+                        "이름",
+                        style: TextStyle(
+                          fontSize: 15.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 169.w - 27.h,
+                      ),
+                      Text(
+                        "점수",
+                        style: TextStyle(
+                          fontSize: 15.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 16.h,
+                  ),
+                  SizedBox(
+                    width: 383.w,
+                    height: 566.h,
+                    child: ListView(
                       children: [
-                        Text(
-                          "랭킹",
-                          style: TextStyle(
-                            fontSize: 15.h,
-                            fontFamily: 'SUITE',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          "이름",
-                          style: TextStyle(
-                            fontSize: 15.h,
-                            fontFamily: 'SUITE',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          "점수",
-                          style: TextStyle(
-                            fontSize: 15.h,
-                            fontFamily: 'SUITE',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        for (int i = 1; i < 21; i++)
+                          if (i < 4)
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 12.w,
+                                  height: 80.h,
+                                ),
+                                Stack(
+                                  children: [
+                                    Text(
+                                      "$i",
+                                      style: TextStyle(
+                                        fontSize: 10 * (4 - 0.5 * i).h,
+                                        fontFamily: 'SUITE',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 90.w,
+                                    )
+                                  ],
+                                ),
+                                Stack(
+                                  children: [
+                                    CustomPaint(
+                                      size: Size(60.h, 60.h),
+                                      painter: CirclePainter(
+                                        radius: 30.h,
+                                        color: Color(0xFFEAF2FF),
+                                        centerX: 30.h,
+                                        centerY: 30.h,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: 12.h,
+                                      top: 12.h,
+                                      child: Image.asset(
+                                        'assets/main/rabbit.png',
+                                        width: 36.h,
+                                        height: 36.h,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          else
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 12.w,
+                                  height: 80.h,
+                                ),
+                                Stack(
+                                  children: [
+                                    Text(
+                                      "$i",
+                                      style: TextStyle(
+                                        fontSize: 20.h,
+                                        fontFamily: 'SUITE',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 90.w,
+                                    ),
+                                  ],
+                                ),
+                                Stack(
+                                  children: [
+                                    CustomPaint(
+                                      size: Size(60.h, 60.h),
+                                      painter: CirclePainter(
+                                        radius: 30.h,
+                                        color: Color(0xFFEAF2FF),
+                                        centerX: 30.h,
+                                        centerY: 30.h,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: 12.h,
+                                      top: 12.h,
+                                      child: Image.asset(
+                                        'assets/main/rabbit.png',
+                                        width: 36.h,
+                                        height: 36.h,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                       ],
                     ),
                   )

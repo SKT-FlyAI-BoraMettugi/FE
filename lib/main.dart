@@ -60,6 +60,8 @@ class _MainPageState extends State<MainPage> {
     // 현재 탭의 Navigator가 존재하고, 뒤로 갈 페이지가 있으면 pop 실행
     if (currentNavigator != null && currentNavigator.canPop()) {
       currentNavigator.pop();
+      FocusScope.of(context).unfocus();
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       return false; // 기본 뒤로 가기 동작을 막음
     }
 
