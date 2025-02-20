@@ -27,6 +27,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
+                    FocusScope.of(context).unfocus();
                   },
                   child: Icon(
                     Icons.arrow_back_ios_new,

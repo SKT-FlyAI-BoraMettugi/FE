@@ -19,10 +19,14 @@ class _ExamTabState extends State<ExamTab> {
   final TextEditingController question = TextEditingController();
   final TextEditingController answer = TextEditingController();
 
+  late FocusNode focusNodet;
+  late FocusNode focusNodeq;
+  late FocusNode focusNodea;
+
   // 문제를 DB로 보낸다.
   Future<String> submit(int userId) async {
     final response =
-        await http.post(Uri.parse('http://boramettugi.com/user/login/$userId'),
+        await http.post(Uri.parse('http://boramettugi.com/question/$userId'),
             body: jsonEncode(<String, String>{
               'title': title.text,
               'question': question.text,
@@ -44,11 +48,23 @@ class _ExamTabState extends State<ExamTab> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    focusNodet = FocusNode();
+    focusNodeq = FocusNode();
+    focusNodea = FocusNode();
+  }
+
+  @override
   void dispose() {
     // TextEditingController를 사용한 후에는 메모리 해제를 위해 dispose() 호출
     title.dispose();
     question.dispose();
     answer.dispose();
+    // 키보드 포커스 해제
+    focusNodet.dispose();
+    focusNodeq.dispose();
+    focusNodea.dispose();
     super.dispose();
   }
 
@@ -164,6 +180,7 @@ class _ExamTabState extends State<ExamTab> {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 15.w),
                                 child: TextField(
+                                  focusNode: focusNodet,
                                   controller: title,
                                   showCursor: true,
                                   style: TextStyle(
@@ -222,6 +239,7 @@ class _ExamTabState extends State<ExamTab> {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 15.w),
                                 child: TextField(
+                                  focusNode: focusNodeq,
                                   controller: question,
                                   maxLines: 10,
                                   showCursor: true,
@@ -283,6 +301,7 @@ class _ExamTabState extends State<ExamTab> {
                                   horizontal: 15.w,
                                 ),
                                 child: TextField(
+                                  focusNode: focusNodea,
                                   controller: answer,
                                   maxLines: 10,
                                   showCursor: true,

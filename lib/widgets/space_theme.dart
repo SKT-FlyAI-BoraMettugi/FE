@@ -42,7 +42,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   ),
                 ),
                 SizedBox(
-                  width: 299.w,
+                  width: 323.w - 24.h,
                 ),
                 GestureDetector(
                   onTap: () {

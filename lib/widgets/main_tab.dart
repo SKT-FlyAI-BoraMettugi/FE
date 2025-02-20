@@ -114,7 +114,7 @@ class MainTab extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      width: 20.w,
+                      width: 101.w - 81.h,
                     ),
                     Icon(
                       Icons.arrow_forward,
