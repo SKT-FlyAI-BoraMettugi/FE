@@ -92,7 +92,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
             ),
             Container(
               width: 393.w,
-              height: 650.h,
+              height: 662.h,
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0),

@@ -1,5 +1,6 @@
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/graph_painter.dart';
 import 'package:FE/widgets/pentagon_painter.dart';
@@ -13,12 +14,11 @@ class ProblemScreen extends StatefulWidget {
 }
 
 class _ProblemScreenState extends State<ProblemScreen> {
-  final TextEditingController _controller = TextEditingController();
-  String _savedText = '';
+  final TextEditingController myanswer = TextEditingController();
 
   @override
   void dispose() {
-    _controller.dispose();
+    myanswer.dispose();
     super.dispose();
   }
 
@@ -168,7 +168,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                                     vertical: 3.h,
                                   ),
                                   child: TextField(
-                                    controller: _controller,
+                                    controller: myanswer,
                                     showCursor: true,
                                     maxLines: 10,
                                     decoration: InputDecoration(
@@ -189,11 +189,51 @@ class _ProblemScreenState extends State<ProblemScreen> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    _savedText =
-                                        _controller.text; // 입력된 텍스트를 저장
-                                  });
-                                  print(_savedText);
+                                  FocusScope.of(context).unfocus();
+                                  SystemChrome.setEnabledSystemUIMode(
+                                      SystemUiMode.immersiveSticky);
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "알림",
+                                          ),
+                                          content: Text(
+                                              "답변 : ${myanswer.text}\n답변을 제출하시겠습니까?"),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title: const Text(
+                                                            "알림",
+                                                          ),
+                                                          content:
+                                                              Text("답변 제출 완료"),
+                                                          actions: [
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                  myanswer
+                                                                      .clear();
+                                                                },
+                                                                child:
+                                                                    Text("확인")),
+                                                          ],
+                                                        );
+                                                      });
+                                                },
+                                                child: Text("제출")),
+                                          ],
+                                        );
+                                      });
                                 },
                                 child: Container(
                                   width: 327.w,
