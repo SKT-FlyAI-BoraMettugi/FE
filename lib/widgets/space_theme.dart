@@ -37,7 +37,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   },
                   child: Icon(
                     Icons.arrow_back_ios,
-                    size: 24.w,
+                    size: 24.h,
                     color: Colors.white,
                   ),
                 ),
@@ -54,14 +54,14 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   },
                   child: Icon(
                     Icons.notifications_none,
-                    size: 24.w,
+                    size: 24.h,
                     color: Colors.white,
                   ),
                 ),
               ],
             ),
             SizedBox(
-              height: 12.72.h,
+              height: 17.h,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +69,8 @@ class _SpaceThemeState extends State<SpaceTheme> {
                 Text(
                   "우주 월드",
                   style: TextStyle(
-                    fontSize: 20.sp,
+                    fontSize: 20.h,
+                    fontFamily: 'SUITE',
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -77,7 +78,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
               ],
             ),
             SizedBox(
-              height: 15.h,
+              height: 10.5.h,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.w),
@@ -91,7 +92,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
             ),
             Container(
               width: 393.w,
-              height: 661.h,
+              height: 650.h,
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0),
@@ -103,29 +104,29 @@ class _SpaceThemeState extends State<SpaceTheme> {
                     left: 54.w,
                     child: Image.asset(
                       'assets/theme/earth.png',
-                      width: 55.w,
+                      width: 55.h,
                       height: 55.h,
                     ),
                   ),
                   Positioned(
                     top: 396.h,
-                    left: 223.w,
+                    left: 250.w,
                     child: Image.asset(
                       'assets/theme/falling_star.png',
-                      width: 112.w,
+                      width: 112.h,
                       height: 112.h,
                     ),
                   ),
                   Positioned(
                     top: 661.h,
-                    left: 76.w,
+                    left: 103.w,
                     child: Transform.scale(
                       scale: 2,
                       child: Transform.rotate(
                         angle: (360 - 138.31) * pi / 180,
                         child: Image.asset(
                           'assets/theme/moon.png',
-                          width: 256.w,
+                          width: 256.h,
                           height: 256.h,
                         ),
                       ),
@@ -133,17 +134,17 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   ),
                   Positioned(
                     top: 527.h,
-                    left: 72.w,
+                    left: 99.w,
                     child: Image.asset(
                       'assets/theme/telescope.png',
-                      width: 63.w,
+                      width: 63.h,
                       height: 63.h,
                     ),
                   ),
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 131.w,
+                    xpos: 150.w,
                     ypos: 147.h,
                     isCleared: isCleared,
                   ),
@@ -157,14 +158,14 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 281.w,
+                    xpos: 262.w,
                     ypos: 147.h,
                     isCleared: isCleared,
                   ),
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 131.w,
+                    xpos: 150.w,
                     ypos: 222.h,
                     isCleared: isCleared,
                   ),
@@ -178,14 +179,14 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 281.w,
+                    xpos: 262.w,
                     ypos: 222.h,
                     isCleared: isCleared,
                   ),
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 57.w,
+                    xpos: 76.w,
                     ypos: 333.h,
                     isCleared: isCleared,
                   ),
@@ -199,14 +200,14 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 207.w,
+                    xpos: 188.w,
                     ypos: 333.h,
                     isCleared: isCleared,
                   ),
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 57.w,
+                    xpos: 76.w,
                     ypos: 408.h,
                     isCleared: isCleared,
                   ),
@@ -220,7 +221,7 @@ class _SpaceThemeState extends State<SpaceTheme> {
                   ThemeButton(
                     colorCleared: Color(0xFFCCF939),
                     colorUnCleared: Color(0xFF595F2C),
-                    xpos: 207.w,
+                    xpos: 188.w,
                     ypos: 408.h,
                     isCleared: isCleared,
                   ),

@@ -34,33 +34,45 @@ class InfoChange extends StatelessWidget {
                         },
                         child: Icon(
                           Icons.arrow_back_ios,
-                          size: 24.w,
+                          size: 24.h,
                         ),
                       ),
+                      SizedBox(
+                        width: 323.w - 24.h,
+                      ),
+                      Icon(
+                        Icons.notifications_none,
+                        size: 24.h,
+                      )
                     ],
                   ),
                   SizedBox(
                     height: 34.h,
                   ),
-                  Stack(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CustomPaint(
-                        size: Size(393.w, 60.h),
-                        painter: CirclePainter(
-                          radius: 30.w,
-                          color: Color(0xFFD9D9D9),
-                          centerX: 197.w,
-                          centerY: 30.h,
-                        ),
-                      ),
-                      Positioned(
-                        left: 173.w,
-                        top: 9.h,
-                        child: Image.asset(
-                          'assets/main/rabbit.png',
-                          width: 48.w,
-                          height: 48.h,
-                        ),
+                      Stack(
+                        children: [
+                          CustomPaint(
+                            size: Size(60.h, 60.h),
+                            painter: CirclePainter(
+                              radius: 30.h,
+                              color: Color(0xFFD9D9D9),
+                              centerX: 30.h,
+                              centerY: 30.h,
+                            ),
+                          ),
+                          Positioned(
+                            left: 6.h,
+                            top: 6.h,
+                            child: Image.asset(
+                              'assets/main/rabbit.png',
+                              width: 48.h,
+                              height: 48.h,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -74,13 +86,14 @@ class InfoChange extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(
-                          vertical: 17.h,
+                          vertical: 10.h,
                         ),
                         child: Text(
                           "이름",
                           style: TextStyle(
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 20.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -90,7 +103,9 @@ class InfoChange extends StatelessWidget {
                       Text(
                         "이동현",
                         style: TextStyle(
-                          fontSize: 17.sp,
+                          fontSize: 20.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
@@ -102,23 +117,26 @@ class InfoChange extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(
-                          vertical: 17.h,
+                          vertical: 10.h,
                         ),
                         child: Text(
                           "생년월일",
                           style: TextStyle(
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 20.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       SizedBox(
-                        width: 69.w,
+                        width: 76.w,
                       ),
                       Text(
                         "99.09.28",
                         style: TextStyle(
-                          fontSize: 17.sp,
+                          fontSize: 20.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w400,
                         ),
                       )
                     ],
@@ -130,23 +148,26 @@ class InfoChange extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(
-                          vertical: 17.h,
+                          vertical: 10.h,
                         ),
                         child: Text(
                           "휴대폰 번호",
                           style: TextStyle(
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 20.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       SizedBox(
-                        width: 48.w,
+                        width: 60.w,
                       ),
                       Text(
                         "010-1234-1234",
                         style: TextStyle(
-                          fontSize: 17.sp,
+                          fontSize: 20.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],

@@ -26,3 +26,12 @@ flutter:
     - assets/shop/
     - assets/theme/
     - assets/images/
+  
+  fonts:
+    - family: SUITE
+      fonts:
+        - asset: assets/font/SUITE/SUITE-Bold.otf
+          weight: 600
+        - asset: assets/font/SUITE/SUITE-Regular.otf
+          weight: 400 
+

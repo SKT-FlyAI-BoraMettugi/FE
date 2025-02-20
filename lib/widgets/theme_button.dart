@@ -37,12 +37,12 @@ class _ThemeButtonState extends State<ThemeButton> {
           );
         },
         child: CustomPaint(
-          size: Size(75.w, 75.h),
+          size: Size(75.h, 75.h),
           painter: CirclePainter(
-            radius: 37.5.w,
+            radius: 37.5.h,
             color:
                 widget.isCleared ? widget.colorCleared : widget.colorUnCleared,
-            centerX: 37.5.w,
+            centerX: 37.5.h,
             centerY: 37.5.h,
           ),
         ),

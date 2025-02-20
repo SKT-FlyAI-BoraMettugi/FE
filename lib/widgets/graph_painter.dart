@@ -14,7 +14,7 @@ class GraphPainter extends CustomPainter {
     // 오각형의 중심 좌표
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
-    final double distance = 105.w;
+    final double distance = 105.h;
 
     for (int i = 0; i < 5; i++) {
       double angle = (pi / 2) + (2 * pi * i / 5); // 72도씩 회전 반시계 방향으로로

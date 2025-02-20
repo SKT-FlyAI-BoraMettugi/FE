@@ -25,14 +25,7 @@ class MyPageTab extends StatelessWidget {
               Row(
                 children: [
                   SizedBox(
-                    width: 23.w,
-                  ),
-                  Icon(
-                    Icons.arrow_back_ios,
-                    size: 24.w,
-                  ),
-                  SizedBox(
-                    width: 299.w,
+                    width: 346.w,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -44,7 +37,7 @@ class MyPageTab extends StatelessWidget {
                     },
                     child: Icon(
                       Icons.notifications_none,
-                      size: 24.w,
+                      size: 24.h,
                     ),
                   ),
                   SizedBox(
@@ -63,11 +56,11 @@ class MyPageTab extends StatelessWidget {
                   Stack(
                     children: [
                       CustomPaint(
-                        size: Size(60.w, 60.h),
+                        size: Size(60.h, 60.h),
                         painter: CirclePainter(
-                          radius: 30.w,
+                          radius: 30.h,
                           color: Color(0xFFD9D9D9),
-                          centerX: 30.w,
+                          centerX: 30.h,
                           centerY: 30.h,
                         ),
                       ),
@@ -76,7 +69,7 @@ class MyPageTab extends StatelessWidget {
                         top: 6.w,
                         child: Image.asset(
                           'assets/main/rabbit.png',
-                          width: 48.w,
+                          width: 48.h,
                           height: 48.h,
                         ),
                       ),
@@ -93,8 +86,9 @@ class MyPageTab extends StatelessWidget {
                           Text(
                             "이동현",
                             style: TextStyle(
+                              fontFamily: 'SUITE',
                               fontWeight: FontWeight.w600,
-                              fontSize: 17.sp,
+                              fontSize: 20.h,
                             ),
                           ),
                         ],
@@ -104,7 +98,9 @@ class MyPageTab extends StatelessWidget {
                           Text(
                             "내 정보 수정",
                             style: TextStyle(
-                              fontSize: 17.sp,
+                              fontSize: 20.h,
+                              fontFamily: 'SUITE',
+                              fontWeight: FontWeight.w600,
                               color: Color(0xFF6F6D6D),
                             ),
                           )
@@ -113,7 +109,7 @@ class MyPageTab extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    width: 172.w,
+                    width: 169.w,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -124,7 +120,7 @@ class MyPageTab extends StatelessWidget {
                     },
                     child: Icon(
                       Icons.arrow_forward_ios,
-                      size: 24.w,
+                      size: 24.h,
                       color: Color(0xFFA6A6A6),
                     ),
                   ),
@@ -154,7 +150,9 @@ class MyPageTab extends StatelessWidget {
                   "로그아웃",
                   style: TextStyle(
                     color: Color(0xFFFF0000),
-                    fontSize: 17.sp,
+                    fontFamily: 'SUITE',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20.h,
                   ),
                 )
               ],

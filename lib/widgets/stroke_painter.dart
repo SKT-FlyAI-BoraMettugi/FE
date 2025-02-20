@@ -20,7 +20,7 @@ class StrokePainter extends CustomPainter {
     // 오각형의 중심 좌표
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
-    final double distancePerScore = 10.7.w; // 반지름 설정
+    final double distancePerScore = 10.5.h; // 반지름 설정
 
     for (int i = 0; i < 5; i++) {
       double angle = (pi / 2) + (2 * pi * i / 5); // 72도씩 회전 반시계 방향으로로

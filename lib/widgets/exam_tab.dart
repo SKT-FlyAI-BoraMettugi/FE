@@ -1,0 +1,309 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class ExamTab extends StatefulWidget {
+  const ExamTab({super.key});
+
+  @override
+  State<ExamTab> createState() => _ExamTabState();
+}
+
+class _ExamTabState extends State<ExamTab> {
+  final TextEditingController controller1 = TextEditingController();
+  final TextEditingController controller2 = TextEditingController();
+  final TextEditingController controller3 = TextEditingController();
+
+  String savedText = '';
+
+  void saveText() {
+    setState(() {
+      savedText =
+          'Text1: ${controller1.text}, Text2: ${controller2.text}, Text3: ${controller3.text}';
+    });
+  }
+
+  @override
+  void dispose() {
+    // TextEditingController를 사용한 후에는 메모리 해제를 위해 dispose() 호출
+    controller1.dispose();
+    controller2.dispose();
+    controller3.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 35.h,
+        ),
+        Row(
+          children: [
+            SizedBox(
+              width: 346.w,
+            ),
+            Icon(
+              Icons.notifications_none,
+              size: 24.h,
+            )
+          ],
+        ),
+        SizedBox(
+          height: 18.h,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "문제 출제",
+              style: TextStyle(
+                fontSize: 20.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 14.h,
+        ),
+        Container(
+          width: 383.w,
+          height: 1.h,
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.1),
+          ),
+        ),
+        SizedBox(
+          height: 14.h,
+        ),
+        Container(
+          width: 377.w,
+          height: 564.h,
+          decoration: BoxDecoration(
+            color: Color(0xFFF9F8FF),
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 12.h,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 15.w,
+                  ),
+                  Text(
+                    "제목",
+                    style: TextStyle(
+                      fontSize: 20.h,
+                      fontFamily: 'SUITE',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 6.h,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 14.w,
+                  ),
+                  Container(
+                    width: 351.w,
+                    height: 46.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.w),
+                      child: TextField(
+                        controller: controller1,
+                        showCursor: true,
+                        style: TextStyle(
+                          fontSize: 15.h,
+                          fontFamily: 'SUITE',
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '제목을 입력하세요.',
+                          hintStyle: TextStyle(
+                            fontSize: 15.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFFA6A6A6),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 15.h,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 14.w,
+                  ),
+                  Text(
+                    "내용",
+                    style: TextStyle(
+                      fontSize: 20.h,
+                      fontFamily: 'SUITE',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 6.h,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 14.w,
+                  ),
+                  Container(
+                    width: 351.w,
+                    height: 178.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.w),
+                      child: TextField(
+                        controller: controller2,
+                        maxLines: 10,
+                        showCursor: true,
+                        style: TextStyle(
+                          fontSize: 15.h,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'SUITE',
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '내용을 입력하세요.',
+                          hintStyle: TextStyle(
+                            fontSize: 15.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFFA6A6A6),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 15.h,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 14.w,
+                  ),
+                  Text(
+                    "답",
+                    style: TextStyle(
+                      fontSize: 20.h,
+                      fontFamily: 'SUITE',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5.h,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 14.w,
+                  ),
+                  Container(
+                    width: 351.w,
+                    height: 175.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15.w,
+                      ),
+                      child: TextField(
+                        controller: controller3,
+                        maxLines: 10,
+                        showCursor: true,
+                        style: TextStyle(
+                          fontFamily: 'SUITE',
+                          fontSize: 15.h,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '답을 입력하세요.',
+                          hintStyle: TextStyle(
+                            fontSize: 15.h,
+                            fontFamily: 'SUITE',
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFFA6A6A6),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 14.h,
+        ),
+        Row(
+          children: [
+            SizedBox(
+              width: 33.w,
+            ),
+            GestureDetector(
+              onTap: saveText,
+              child: Container(
+                width: 327.w,
+                height: 48.h,
+                decoration: BoxDecoration(
+                  color: Color(0xFF01D4AD),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "출제하기",
+                      style: TextStyle(
+                        fontSize: 15.h,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'SUITE',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
+}
