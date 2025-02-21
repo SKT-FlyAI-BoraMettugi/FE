@@ -69,16 +69,44 @@ class _MainPageState extends State<MainPage> {
     bool? exitApp = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("앱 종료"),
-        content: const Text("앱을 종료하시겠습니까?"),
+        title: Text(
+          "앱 종료",
+          style: TextStyle(
+            fontSize: 20.h,
+            fontFamily: 'SUITE',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          "앱을 종료하시겠습니까?",
+          style: TextStyle(
+            fontSize: 15.h,
+            fontFamily: 'SUITE',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text("아니요"),
+            child: Text(
+              "아니요",
+              style: TextStyle(
+                fontSize: 15.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text("예"),
+            child: Text(
+              "예",
+              style: TextStyle(
+                fontSize: 15.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
         ],
       ),

@@ -16,7 +16,7 @@ class ExamTab extends StatefulWidget {
 
 class _ExamTabState extends State<ExamTab> {
   final TextEditingController title = TextEditingController();
-  final TextEditingController question = TextEditingController();
+  final TextEditingController description = TextEditingController();
   final TextEditingController answer = TextEditingController();
 
   late FocusNode focusNodet;
@@ -25,76 +25,75 @@ class _ExamTabState extends State<ExamTab> {
 
   // 문제를 DB로 보낸다.
   Future<void> submit(BuildContext context) async {
+    // 로딩 다이얼로그 표시
     showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(
-              child: CircularProgressIndicator(),
-            ));
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
 
     try {
       final response = await http.post(
-          Uri.parse(
-              'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/1'),
-          body: utf8.encode(jsonEncode({
+        Uri.parse(
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/1',
+        ),
+        body: utf8.encode(
+          jsonEncode({
             'title': title.text,
-            'description': question.text,
+            'description': description.text,
             'answer': answer.text,
-          })));
+          }),
+        ),
+      );
 
-      Navigator.of(context, rootNavigator: true).pop();
+      // 다이얼로그 닫기 (현재 context가 유효한지 확인)
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
 
-      if (response.statusCode == 200) {
-        return showDialog(
+      // 응답 결과에 따라 알림 표시 (context 사용 전에 mounted 확인)
+      if (context.mounted) {
+        showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text("알림"),
-            content: Text("문제 출제 완료"),
+            content: Text(response.statusCode == 200 ? "문제 출제 완료" : "응답 오류"),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("확인"),
-              ),
-            ],
-          ),
-        );
-      } else {
-        return showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("알림"),
-            content: Text("응답 오류"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("닫기"),
+                child: const Text("확인"),
               ),
             ],
           ),
         );
       }
     } catch (e) {
-      Navigator.pop(context); // 로딩 다이얼로그 닫기 (예외 발생 시)
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("오류"),
-          content: Text("네트워크 오류: $e"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("닫기"),
-            ),
-          ],
-        ),
-      );
+      // 네트워크 오류 발생 시, 다이얼로그 닫기 (context가 mounted인지 확인)
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("오류"),
+            content: Text("네트워크 오류: $e"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("닫기"),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
   // 텍스트 상자를 초기화한다.
   void clearTextFields() {
     title.clear();
-    question.clear();
+    description.clear();
     answer.clear();
   }
 
@@ -110,7 +109,7 @@ class _ExamTabState extends State<ExamTab> {
   void dispose() {
     // TextEditingController를 사용한 후에는 메모리 해제를 위해 dispose() 호출
     title.dispose();
-    question.dispose();
+    description.dispose();
     answer.dispose();
     // 키보드 포커스 해제
     focusNodet.dispose();
@@ -291,7 +290,7 @@ class _ExamTabState extends State<ExamTab> {
                                 padding: EdgeInsets.symmetric(horizontal: 15.w),
                                 child: TextField(
                                   focusNode: focusNodeq,
-                                  controller: question,
+                                  controller: description,
                                   maxLines: 10,
                                   showCursor: true,
                                   style: TextStyle(
@@ -387,18 +386,46 @@ class _ExamTabState extends State<ExamTab> {
                       SizedBox(
                         width: 33.w,
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          FocusScope.of(context).unfocus();
-                          SystemChrome.setEnabledSystemUIMode(
-                              SystemUiMode.immersiveSticky);
-                          submit(context);
-                        },
-                        child: Container(
+                      if ((title.text.isNotEmpty &&
+                              description.text.isNotEmpty &&
+                              answer.text.isNotEmpty) ==
+                          true)
+                        GestureDetector(
+                          onTap: () {
+                            FocusScope.of(context).unfocus();
+                            SystemChrome.setEnabledSystemUIMode(
+                                SystemUiMode.immersiveSticky);
+                            submit(context);
+                          },
+                          child: Container(
+                            width: 327.w,
+                            height: 48.h,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF01D4AD),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "출제하기",
+                                  style: TextStyle(
+                                    fontSize: 15.h,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'SUITE',
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        Container(
                           width: 327.w,
                           height: 48.h,
                           decoration: BoxDecoration(
-                            color: Color(0xFF01D4AD),
+                            color: Color(0xFFA6A6A6),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Row(
@@ -416,7 +443,6 @@ class _ExamTabState extends State<ExamTab> {
                             ],
                           ),
                         ),
-                      ),
                     ],
                   ),
                   Builder(
