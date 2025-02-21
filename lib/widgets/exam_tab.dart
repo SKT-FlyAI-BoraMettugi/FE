@@ -24,19 +24,70 @@ class _ExamTabState extends State<ExamTab> {
   late FocusNode focusNodea;
 
   // 문제를 DB로 보낸다.
-  Future<String> submit(int userId) async {
-    final response =
-        await http.post(Uri.parse('http://boramettugi.com/question/$userId'),
-            body: jsonEncode(<String, String>{
-              'title': title.text,
-              'question': question.text,
-              'answer': answer.text,
-            }));
-    if (response.statusCode == 201) {
-      final Map<String, dynamic> exam = jsonDecode(response.body);
-      return ExamModel.fromJson(exam).message;
-    } else {
-      throw Exception('문제 출제에 오류가 발생했습니다. 다시 시도해주세요.');
+  Future<void> submit(BuildContext context) async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(
+              child: CircularProgressIndicator(),
+            ));
+
+    try {
+      final response = await http.post(
+          Uri.parse(
+              'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/1'),
+          body: utf8.encode(jsonEncode({
+            'title': title.text,
+            'description': question.text,
+            'answer': answer.text,
+          })));
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (response.statusCode == 200) {
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("알림"),
+            content: Text("문제 출제 완료"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("확인"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("알림"),
+            content: Text("응답 오류"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("닫기"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // 로딩 다이얼로그 닫기 (예외 발생 시)
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("오류"),
+          content: Text("네트워크 오류: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("닫기"),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -341,43 +392,7 @@ class _ExamTabState extends State<ExamTab> {
                           FocusScope.of(context).unfocus();
                           SystemChrome.setEnabledSystemUIMode(
                               SystemUiMode.immersiveSticky);
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text(
-                                    "알림",
-                                  ),
-                                  content: Text(
-                                      "제목 : ${title.text}\n질문 : ${question.text}\n답 : ${answer.text}"),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                    "알림",
-                                                  ),
-                                                  content: Text("문제 출제 완료"),
-                                                  actions: [
-                                                    TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                          clearTextFields();
-                                                        },
-                                                        child: Text("확인")),
-                                                  ],
-                                                );
-                                              });
-                                        },
-                                        child: Text("제출")),
-                                  ],
-                                );
-                              });
+                          submit(context);
                         },
                         child: Container(
                           width: 327.w,
