@@ -1,3 +1,4 @@
+// 채점 결과 불러오는 모델
 class GetresultModel {
   final int creativity, logic, thinking, persuasion, depth, total_score;
   final String creativity_review,

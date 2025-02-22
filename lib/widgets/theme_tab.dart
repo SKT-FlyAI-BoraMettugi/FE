@@ -5,7 +5,7 @@ import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/circle_painter.dart';
-import 'package:FE/widgets/space_theme.dart';
+import 'package:FE/widgets/detailtheme.dart';
 import 'package:http/http.dart' as http;
 
 class ThemeTab extends StatefulWidget {
@@ -107,7 +107,7 @@ class _ThemeTabState extends State<ThemeTab> {
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                      "테마를 불러오는 데 실패했습니다.",
+                      "테마를 불러오는데 실패했습니다.",
                       style: TextStyle(
                         fontSize: 20.h,
                         fontFamily: 'SUITE',
@@ -131,7 +131,11 @@ class _ThemeTabState extends State<ThemeTab> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SpaceTheme()),
+                                builder: (context) => Detailtheme(
+                                  theme_id: snapshot.data![index].theme_id,
+                                  theme_name: snapshot.data![index].theme_name,
+                                ),
+                              ),
                             );
                           },
                           child: Container(

@@ -6,7 +6,6 @@ import 'package:FE/widgets/pentagon_painter.dart';
 import 'package:FE/widgets/stroke_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
 class ResultTab extends StatefulWidget {

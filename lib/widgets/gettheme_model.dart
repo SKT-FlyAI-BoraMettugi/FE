@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+// 전체 테마 불러오는 모델
 
 class GetthemeModel {
   final int theme_id;

@@ -43,12 +43,33 @@ class _QuestionTabState extends State<QuestionTab> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("알림"),
-            content: Text(response.statusCode == 200 ? "문제 출제 완료" : "응답 오류"),
+            title: Text(
+              "알림",
+              style: TextStyle(
+                fontSize: 20.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            content: Text(
+              response.statusCode == 200 ? "문제 출제 완료" : "응답 오류",
+              style: TextStyle(
+                fontSize: 15.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("확인"),
+                child: Text(
+                  "확인",
+                  style: TextStyle(
+                    fontSize: 15.h,
+                    fontFamily: 'SUITE',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
               ),
             ],
           ),
@@ -61,12 +82,33 @@ class _QuestionTabState extends State<QuestionTab> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text("오류"),
-            content: Text("네트워크 오류: $e"),
+            title: Text(
+              "오류",
+              style: TextStyle(
+                fontSize: 20.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            content: Text(
+              "네트워크 오류: $e",
+              style: TextStyle(
+                fontSize: 15.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("닫기"),
+                child: Text(
+                  "닫기",
+                  style: TextStyle(
+                    fontSize: 15.h,
+                    fontFamily: 'SUITE',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
               ),
             ],
           ),
