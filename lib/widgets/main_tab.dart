@@ -1,10 +1,7 @@
-import 'dart:ffi';
-
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:FE/widgets/ranking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:FE/widgets/elipse_painter.dart';
 
 class MainTab extends StatelessWidget {
   const MainTab({

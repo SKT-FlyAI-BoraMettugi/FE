@@ -7,7 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProblemScreen extends StatefulWidget {
-  const ProblemScreen({super.key});
+  final int questionId;
+
+  const ProblemScreen({super.key, required this.questionId});
 
   @override
   State<ProblemScreen> createState() => _ProblemScreenState();
@@ -133,9 +135,15 @@ class _ProblemScreenState extends State<ProblemScreen> {
                   child: TabBarView(
                     physics: NeverScrollableScrollPhysics(),
                     children: [
-                      QuestionTab(),
-                      ResultTab(),
-                      DiscussionTab(),
+                      QuestionTab(
+                        questionID: widget.questionId,
+                      ),
+                      ResultTab(
+                        questionID: widget.questionId,
+                      ),
+                      DiscussionTab(
+                        questionID: widget.questionId,
+                      ),
                     ],
                   ),
                 ),

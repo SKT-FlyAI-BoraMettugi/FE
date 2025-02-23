@@ -141,74 +141,46 @@ class _DetailThemeState extends State<Detailtheme> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      top: 136.h,
-                      child: SizedBox(
-                        width: 393.w,
-                        height: 652.h,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 20.h,
+                    SizedBox(
+                      width: 393.w,
+                      height: 652.h,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 20.h,
+                        ),
+                        child: GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 30.h,
+                            mainAxisSpacing: 30.h,
                           ),
-                          child: GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              crossAxisSpacing: 30.h,
-                              mainAxisSpacing: 30.h,
-                            ),
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              if (index < 5) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProblemScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 75.h,
-                                    height: 75.h,
-                                    decoration: BoxDecoration(
-                                      color: (snapshot.data![index]
-                                                  .low_fail_color ==
-                                              "#FFFFFF")
-                                          ? getColorFromApiResponse(snapshot
-                                              .data![index].low_succ_color)
-                                          : getColorFromApiResponse(snapshot
-                                              .data![index].low_fail_color),
-                                      borderRadius: BorderRadius.circular(75.h),
-                                      border: Border.all(
-                                          color: Color(0xFF142AF2), width: 2),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "${snapshot.data![index].stage}",
-                                        style: TextStyle(
-                                          fontSize: 20.h,
-                                          fontFamily: 'SUITE',
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index < 5) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProblemScreen(
+                                        questionId: snapshot.data![index].stage,
                                       ),
                                     ),
-                                  ),
-                                );
-                              } else if (index < 9) {
-                                return Container(
+                                  );
+                                },
+                                child: Container(
                                   width: 75.h,
                                   height: 75.h,
                                   decoration: BoxDecoration(
                                     color:
-                                        (snapshot.data![index].mid_fail_color ==
+                                        (snapshot.data![index].low_fail_color ==
                                                 "#FFFFFF")
                                             ? getColorFromApiResponse(snapshot
-                                                .data![index].mid_succ_color)
+                                                .data![index].low_succ_color)
                                             : getColorFromApiResponse(snapshot
-                                                .data![index].mid_fail_color),
+                                                .data![index].low_fail_color),
                                     borderRadius: BorderRadius.circular(75.h),
                                     border: Border.all(
                                         color: Color(0xFF142AF2), width: 2),
@@ -223,37 +195,64 @@ class _DetailThemeState extends State<Detailtheme> {
                                       ),
                                     ),
                                   ),
-                                );
-                              } else {
-                                return Container(
-                                  width: 75.h,
-                                  height: 75.h,
-                                  decoration: BoxDecoration(
-                                    color: (snapshot
-                                                .data![index].high_fail_color ==
-                                            "#FFFFFF")
-                                        ? getColorFromApiResponse(snapshot
-                                            .data![index].high_succ_color)
-                                        : getColorFromApiResponse(snapshot
-                                            .data![index].high_fail_color),
-                                    borderRadius: BorderRadius.circular(75.h),
-                                    border: Border.all(
-                                        color: Color(0xFF142AF2), width: 2),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "${snapshot.data![index].stage}",
-                                      style: TextStyle(
-                                        fontSize: 20.h,
-                                        fontFamily: 'SUITE',
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                ),
+                              );
+                            } else if (index < 9) {
+                              return Container(
+                                width: 75.h,
+                                height: 75.h,
+                                decoration: BoxDecoration(
+                                  color: (snapshot
+                                              .data![index].mid_fail_color ==
+                                          "#FFFFFF")
+                                      ? getColorFromApiResponse(
+                                          snapshot.data![index].mid_succ_color)
+                                      : getColorFromApiResponse(
+                                          snapshot.data![index].mid_fail_color),
+                                  borderRadius: BorderRadius.circular(75.h),
+                                  border: Border.all(
+                                      color: Color(0xFF142AF2), width: 2),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "${snapshot.data![index].stage}",
+                                    style: TextStyle(
+                                      fontSize: 20.h,
+                                      fontFamily: 'SUITE',
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                );
-                              }
-                            },
-                          ),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 75.h,
+                                height: 75.h,
+                                decoration: BoxDecoration(
+                                  color: (snapshot
+                                              .data![index].high_fail_color ==
+                                          "#FFFFFF")
+                                      ? getColorFromApiResponse(
+                                          snapshot.data![index].high_succ_color)
+                                      : getColorFromApiResponse(snapshot
+                                          .data![index].high_fail_color),
+                                  borderRadius: BorderRadius.circular(75.h),
+                                  border: Border.all(
+                                      color: Color(0xFF142AF2), width: 2),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "${snapshot.data![index].stage}",
+                                    style: TextStyle(
+                                      fontSize: 20.h,
+                                      fontFamily: 'SUITE',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ),
                     ),

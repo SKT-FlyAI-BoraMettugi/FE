@@ -1,14 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 
 class QuestionTab extends StatefulWidget {
-  const QuestionTab({
-    super.key,
-  });
+  final int questionID;
+  const QuestionTab({super.key, required this.questionID});
 
   @override
   State<QuestionTab> createState() => _QuestionTabState();
@@ -29,7 +26,7 @@ class _QuestionTabState extends State<QuestionTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/1',
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/${widget.questionID}',
         ),
       );
 

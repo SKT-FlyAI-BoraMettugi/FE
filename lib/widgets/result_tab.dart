@@ -9,9 +9,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 
 class ResultTab extends StatefulWidget {
-  const ResultTab({
-    super.key,
-  });
+  final int questionID;
+
+  const ResultTab({super.key, required this.questionID});
 
   @override
   State<ResultTab> createState() => _ResultTabState();
@@ -20,7 +20,8 @@ class ResultTab extends StatefulWidget {
 class _ResultTabState extends State<ResultTab> {
   Future<GetresultModel> result() async {
     final response = await http.get(
-      Uri.parse('http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/1/1'),
+      Uri.parse(
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/1/${widget.questionID}'),
     );
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);
