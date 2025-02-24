@@ -97,7 +97,7 @@ class _ThemeTabState extends State<ThemeTab> {
             ),
           ),
           SizedBox(
-            height: 8.h,
+            height: 14.h,
           ),
           FutureBuilder(
               future: getThemeList(),
@@ -119,7 +119,7 @@ class _ThemeTabState extends State<ThemeTab> {
                   int listlength = snapshot.data!.length;
                   return SizedBox(
                     width: 393.w,
-                    height: 600.h,
+                    height: 590.h,
                     child: ListView.separated(
                       itemCount: listlength,
                       separatorBuilder: (context, index) => SizedBox(

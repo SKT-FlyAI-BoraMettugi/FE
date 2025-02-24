@@ -158,7 +158,7 @@ class _DetailThemeState extends State<Detailtheme> {
                           ),
                           itemCount: snapshot.data!.length,
                           itemBuilder: (BuildContext context, int index) {
-                            if (index < 5) {
+                            if (index < 4) {
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -199,7 +199,7 @@ class _DetailThemeState extends State<Detailtheme> {
                                   ),
                                 ),
                               );
-                            } else if (index < 9) {
+                            } else if (index < 8) {
                               return Container(
                                 width: 75.h,
                                 height: 75.h,

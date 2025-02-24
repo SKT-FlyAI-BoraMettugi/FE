@@ -309,7 +309,9 @@ class _MainPageState extends State<MainPage> {
       case 3:
         return ShopTab();
       case 4:
-        return MyPageTab();
+        return MyPageTab(
+          nickname: nickname,
+        );
       default:
         return Center(child: Text("Error"));
     }

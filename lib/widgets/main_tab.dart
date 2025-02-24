@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MainTab extends StatefulWidget {
-  final int userrank;
-  final int score;
-  final String nickname;
+  int userrank;
+  int score;
+  String nickname;
 
-  const MainTab({
+  MainTab({
     super.key,
     required this.userrank,
     required this.score,

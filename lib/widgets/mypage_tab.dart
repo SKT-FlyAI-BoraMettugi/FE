@@ -6,9 +6,8 @@ import 'package:FE/widgets/circle_painter.dart';
 import 'package:FE/widgets/info_change.dart';
 
 class MyPageTab extends StatelessWidget {
-  const MyPageTab({
-    super.key,
-  });
+  String nickname;
+  MyPageTab({super.key, required this.nickname});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,7 @@ class MyPageTab extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "이동현",
+                            nickname,
                             style: TextStyle(
                               fontFamily: 'SUITE',
                               fontWeight: FontWeight.w600,
@@ -117,7 +116,9 @@ class MyPageTab extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => InfoChange()),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                InfoChange(nickname: nickname)),
                       );
                     },
                     child: Icon(
