@@ -166,6 +166,8 @@ class _DetailThemeState extends State<Detailtheme> {
                                     MaterialPageRoute(
                                       builder: (context) => ProblemScreen(
                                         questionId: snapshot.data![index].stage,
+                                        theme_name:
+                                            snapshot.data![index].theme_name,
                                       ),
                                     ),
                                   );

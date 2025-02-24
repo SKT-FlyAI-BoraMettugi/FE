@@ -332,7 +332,8 @@ class _ExamTabState extends State<ExamTab> {
                                 child: TextField(
                                   focusNode: focusNodeq,
                                   controller: description,
-                                  maxLines: 10,
+                                  minLines: 1,
+                                  maxLines: null,
                                   showCursor: true,
                                   style: TextStyle(
                                     fontSize: 15.h,
@@ -394,7 +395,8 @@ class _ExamTabState extends State<ExamTab> {
                                 child: TextField(
                                   focusNode: focusNodea,
                                   controller: answer,
-                                  maxLines: 10,
+                                  minLines: 1,
+                                  maxLines: null,
                                   showCursor: true,
                                   style: TextStyle(
                                     fontFamily: 'SUITE',
@@ -437,6 +439,7 @@ class _ExamTabState extends State<ExamTab> {
                             SystemChrome.setEnabledSystemUIMode(
                                 SystemUiMode.immersiveSticky);
                             submit(context);
+                            clearTextFields();
                           },
                           child: Container(
                             width: 327.w,

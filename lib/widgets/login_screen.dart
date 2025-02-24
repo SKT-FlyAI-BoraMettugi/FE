@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:FE/main.dart';
+import 'package:FE/widgets/geturl_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,8 +16,25 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController id = TextEditingController();
-  final TextEditingController pw = TextEditingController();
+  late String url;
+
+  Future<String> kakaourl() async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/auth/kakao/login-url'));
+    if (response.statusCode == 200) {
+      final Map<String, String> jsonurl = jsonDecode(response.body);
+      final GeturlModel url = GeturlModel.fromJson(jsonurl);
+      return url.login_url;
+    }
+    throw Error();
+  }
+
+  void fetchurl() async {
+    final futureurl = await kakaourl();
+    setState(() {
+      url = futureurl;
+    });
+  }
 
   @override
   void initState() {
@@ -21,8 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    id.clear();
-    pw.clear();
     super.dispose();
   }
 
@@ -78,39 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               padding: EdgeInsets.symmetric(horizontal: 20.w),
                               child: Column(
                                 children: [
-                                  TextField(
-                                    controller: id,
-                                    showCursor: true,
-                                    style: TextStyle(
-                                      fontSize: 15.h,
-                                      fontFamily: 'SUITE',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                        hintText: "아이디",
-                                        hintStyle: TextStyle(
-                                          fontSize: 15.h,
-                                          fontFamily: 'SUITE',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFFA6A6A6),
-                                        )),
-                                  ),
-                                  TextField(
-                                    controller: pw,
-                                    showCursor: true,
-                                    style: TextStyle(
-                                      fontSize: 15.h,
-                                      fontFamily: 'SUITE',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                        hintText: "비밀번호",
-                                        hintStyle: TextStyle(
-                                          fontSize: 15.h,
-                                          fontFamily: 'SUITE',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFFA6A6A6),
-                                        )),
+                                  GestureDetector(
+                                    onTap: () {
+                                      fetchurl();
+                                      launchUrl(Uri.parse(url));
+                                    },
+                                    child: Image.asset(
+                                        'assets/login/kakao_login_large_narrow.png'),
                                   ),
                                 ],
                               ),
@@ -132,30 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialPageRoute(
                                   builder: (context) => MainPage()),
                             );
-                            id.clear();
-                            pw.clear();
                           },
-                          child: Container(
-                            width: 120.w,
-                            height: 40.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "로그인",
-                                  style: TextStyle(
-                                    fontSize: 20.h,
-                                    fontFamily: 'SUITE',
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                       ],
                     )

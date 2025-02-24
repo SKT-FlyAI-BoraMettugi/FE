@@ -8,8 +8,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProblemScreen extends StatefulWidget {
   final int questionId;
+  final String theme_name;
 
-  const ProblemScreen({super.key, required this.questionId});
+  const ProblemScreen(
+      {super.key, required this.questionId, required this.theme_name});
 
   @override
   State<ProblemScreen> createState() => _ProblemScreenState();
@@ -143,6 +145,7 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       ),
                       DiscussionTab(
                         questionID: widget.questionId,
+                        theme_name: widget.theme_name,
                       ),
                     ],
                   ),

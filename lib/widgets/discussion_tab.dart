@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:FE/widgets/getlike_model.dart';
 import 'package:FE/widgets/getresult_model.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/getdiscussion_model.dart';
 import 'package:flutter/material.dart';
@@ -9,20 +10,23 @@ import 'package:http/http.dart' as http;
 
 class DiscussionTab extends StatefulWidget {
   final int questionID;
+  final String theme_name;
 
-  const DiscussionTab({super.key, required this.questionID});
+  const DiscussionTab(
+      {super.key, required this.questionID, required this.theme_name});
 
   @override
   State<DiscussionTab> createState() => _DiscusstionTabState();
 }
 
 class _DiscusstionTabState extends State<DiscussionTab> {
-  late int totalScore;
+  int totalScore = 0;
   late Map<int, int> likeCount = {};
   late int likereply;
 
   TextEditingController comment = TextEditingController();
   TextEditingController reply = TextEditingController();
+  late FocusNode focusnodec;
 
   Future<List<GetdiscussionModel>> discussion() async {
     List<GetdiscussionModel> discussionInstances = [];
@@ -71,7 +75,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   Future<void> postcomment() async {
     await http.post(
       Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/1/1'),
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/1/${widget.questionID}'),
       body: utf8.encode(
         jsonEncode(
           {
@@ -108,7 +112,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   Future<int> replylike(int commentId) async {
     final response = await http.patch(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like//comment/like/$commentId/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/comment/like/$commentId/1'));
     if (response.statusCode == 200) {
       final Map<String, int> replylikes = jsonDecode(response.body);
       final GetlikeModel replylike = GetlikeModel.fromJson(replylikes);
@@ -165,163 +169,292 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   void initState() {
     super.initState();
     fetchscore();
+    focusnodec = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    comment.dispose();
+    focusnodec.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: discussion(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              "진행중인 토론이 없습니다.",
-              style: TextStyle(
-                fontSize: 20.h,
-                fontFamily: 'SUITE',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          );
-        } else {
-          if (totalScore >= 35) {
-            return SizedBox(
-              width: 393.w,
-              height: 580.h,
-              child: ListView.separated(
-                itemCount: snapshot.data!.length,
-                separatorBuilder: (context, index) => SizedBox(
-                  height: 8.h,
+    return Stack(
+      children: [
+        FutureBuilder(
+          future: discussion(),
+          builder: (context, snapshot) {
+            print(likeCount);
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  "진행중인 토론이 없습니다.",
+                  style: TextStyle(
+                    fontSize: 20.h,
+                    fontFamily: 'SUITE',
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 15.w,
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 15.w,
+              );
+            } else {
+              if (totalScore >= 35) {
+                return Column(
+                  children: [
+                    SizedBox(
+                      width: 393.w,
+                      height: 560.h,
+                      child: ListView.separated(
+                        itemCount: snapshot.data!.length,
+                        separatorBuilder: (context, index) => SizedBox(
+                          height: 8.h,
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF6F5FF),
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top: 5.h,
-                              right: 10.w,
-                              left: 5.h,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 15.w,
                             ),
                             child: Row(
                               children: [
                                 SizedBox(
-                                  width: 67.w,
+                                  width: 15.w,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFF6F5FF),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 5.h,
+                                      right: 10.w,
+                                      left: 5.h,
+                                    ),
+                                    child: Row(
                                       children: [
-                                        Text(
-                                          "${snapshot.data![index].user_id}",
-                                          style: TextStyle(
-                                            fontSize: 15.h,
-                                            fontFamily: 'SUITE',
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
                                         SizedBox(
-                                          width: 5.w,
+                                          width: 67.w,
                                         ),
-                                        Text(
-                                          timeAgo(snapshot
-                                              .data![index].created_date),
-                                          style: TextStyle(
-                                            fontSize: 10.h,
-                                            fontFamily: 'SUITE',
-                                            fontWeight: FontWeight.w400,
-                                            color: Color(0xFFA6A6A6),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 247.w - 71.h,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            fetchcommentlike(snapshot
-                                                .data![index].discussion_id);
-                                          },
-                                          child: (likeCount[snapshot
-                                                      .data![index]
-                                                      .discussion_id] ==
-                                                  0)
-                                              ? Icon(
-                                                  Icons.favorite_border,
-                                                  size: 14.h,
-                                                  color: Colors.red,
-                                                )
-                                              : Icon(
-                                                  Icons.favorite,
-                                                  size: 14.h,
-                                                  color: Colors.red,
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "${snapshot.data![index].user_id}",
+                                                  style: TextStyle(
+                                                    fontSize: 15.h,
+                                                    fontFamily: 'SUITE',
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
-                                        ),
-                                        SizedBox(
-                                          width: 2.w,
-                                        ),
-                                        Stack(children: [
-                                          SizedBox(
-                                            width: 15.w,
-                                          ),
-                                          Text(
-                                            "${snapshot.data![index].like}",
-                                            style: TextStyle(
-                                              fontSize: 10.h,
-                                              fontFamily: 'SUITE',
-                                              fontWeight: FontWeight.w400,
+                                                SizedBox(
+                                                  width: 5.w,
+                                                ),
+                                                Stack(
+                                                  children: [
+                                                    Text(
+                                                      timeAgo(snapshot
+                                                          .data![index]
+                                                          .created_date),
+                                                      style: TextStyle(
+                                                        fontSize: 10.h,
+                                                        fontFamily: 'SUITE',
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color:
+                                                            Color(0xFFA6A6A6),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 208.w,
+                                                    ),
+                                                  ],
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    fetchcommentlike(snapshot
+                                                        .data![index]
+                                                        .discussion_id);
+                                                  },
+                                                  child: (likeCount[snapshot
+                                                              .data![index]
+                                                              .discussion_id] ==
+                                                          0)
+                                                      ? Icon(
+                                                          Icons.favorite_border,
+                                                          size: 14.h,
+                                                          color:
+                                                              Color(0xFF006FFD),
+                                                        )
+                                                      : Icon(
+                                                          Icons.favorite,
+                                                          size: 14.h,
+                                                          color:
+                                                              Color(0xFF006FFD),
+                                                        ),
+                                                ),
+                                                SizedBox(
+                                                  width: 2.w,
+                                                ),
+                                                Stack(children: [
+                                                  SizedBox(
+                                                    width: 15.w,
+                                                  ),
+                                                  Text(
+                                                    "${snapshot.data![index].like}",
+                                                    style: TextStyle(
+                                                      fontSize: 10.h,
+                                                      fontFamily: 'SUITE',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ]),
+                                              ],
                                             ),
-                                          ),
-                                        ]),
+                                            Text(
+                                              snapshot.data![index].content,
+                                              style: TextStyle(
+                                                fontSize: 15.h,
+                                                fontFamily: 'SUITE',
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                    Text(
-                                      snapshot.data![index].content,
-                                      style: TextStyle(
-                                        fontSize: 15.h,
-                                        fontFamily: 'SUITE',
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
+                  ],
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    "토론은 문제를 푼 이후에 확인 가능합니다.",
+                    style: TextStyle(
+                      fontSize: 20.h,
+                      fontFamily: 'SUITE',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }
+            }
+          },
+        ),
+        SizedBox(
+          height: 10.h,
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  SizedBox(
+                    width: 70.w,
+                  ),
+                  Container(
+                    width: 298.w,
+                    height: 46.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15.w,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 230.w,
+                            height: 46.h,
+                            child: TextField(
+                              showCursor: true,
+                              textAlignVertical: TextAlignVertical.center,
+                              minLines: 1,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              decoration: InputDecoration(
+                                hintText:
+                                    "${widget.theme_name} 문제 ${widget.questionID}번에 의견 남기기",
+                                hintStyle: TextStyle(
+                                  fontSize: 15.h,
+                                  fontFamily: 'SUITE',
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFFA6A6A6),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              controller: comment,
+                              style: TextStyle(
+                                fontSize: 15.h,
+                                fontFamily: 'SUITE',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (comment.text.isNotEmpty == true) {
+                                FocusScope.of(context).unfocus();
+                                SystemChrome.setEnabledSystemUIMode(
+                                    SystemUiMode.immersiveSticky);
+                                postcomment();
+                                comment.clear();
+                              }
+                            },
+                            child: Container(
+                              width: 38.h,
+                              height: 38.h,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFB1B2FF),
+                                borderRadius: BorderRadius.circular(12.h),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.send_outlined,
+                                  size: 24.h,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            );
-          } else {
-            return Center(
-              child: Text(
-                "토론은 문제를 푼 이후에 확인 가능합니다.",
-                style: TextStyle(
-                  fontSize: 20.h,
-                  fontFamily: 'SUITE',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            );
-          }
-        }
-      },
+              (MediaQuery.of(context).viewInsets.bottom != 0)
+                  ? SizedBox(
+                      height: MediaQuery.of(context).viewInsets.bottom - 90,
+                    )
+                  : SizedBox(
+                      height: 0,
+                    ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
