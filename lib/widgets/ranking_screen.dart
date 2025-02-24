@@ -1,13 +1,31 @@
+import 'dart:convert';
+
 import 'package:FE/widgets/circle_painter.dart';
+import 'package:FE/widgets/getranking_model.dart';
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 
 class RankingScreen extends StatefulWidget {
   const RankingScreen({super.key});
 
   @override
   State<RankingScreen> createState() => _RankingScreenState();
+}
+
+Future<List<GetrankingModel>> ranking() async {
+  List<GetrankingModel> rankingInstances = [];
+  final response = await http.get(
+      Uri.parse('http://nolly.ap-northeast-2.elasticbeanstalk.com/ranking'));
+  if (response.statusCode == 200) {
+    final List<dynamic> ranks = jsonDecode(response.body);
+    for (var rank in ranks) {
+      rankingInstances.add(GetrankingModel.fromJson(rank));
+    }
+    return rankingInstances;
+  }
+  throw Error();
 }
 
 class _RankingScreenState extends State<RankingScreen> {
@@ -145,102 +163,177 @@ class _RankingScreenState extends State<RankingScreen> {
                   SizedBox(
                     width: 383.w,
                     height: 566.h,
-                    child: ListView(
-                      children: [
-                        for (int i = 1; i < 21; i++)
-                          if (i < 4)
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 12.w,
-                                  height: 80.h,
-                                ),
-                                Stack(
-                                  children: [
-                                    Text(
-                                      "$i",
-                                      style: TextStyle(
-                                        fontSize: 10 * (4 - 0.5 * i).h,
-                                        fontFamily: 'SUITE',
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 90.w,
-                                    )
-                                  ],
-                                ),
-                                Stack(
-                                  children: [
-                                    CustomPaint(
-                                      size: Size(60.h, 60.h),
-                                      painter: CirclePainter(
-                                        radius: 30.h,
-                                        color: Color(0xFFEAF2FF),
-                                        centerX: 30.h,
-                                        centerY: 30.h,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 12.h,
-                                      top: 12.h,
-                                      child: Image.asset(
-                                        'assets/main/rabbit.png',
-                                        width: 36.h,
-                                        height: 36.h,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          else
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 12.w,
-                                  height: 80.h,
-                                ),
-                                Stack(
-                                  children: [
-                                    Text(
-                                      "$i",
-                                      style: TextStyle(
-                                        fontSize: 20.h,
-                                        fontFamily: 'SUITE',
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 90.w,
-                                    ),
-                                  ],
-                                ),
-                                Stack(
-                                  children: [
-                                    CustomPaint(
-                                      size: Size(60.h, 60.h),
-                                      painter: CirclePainter(
-                                        radius: 30.h,
-                                        color: Color(0xFFEAF2FF),
-                                        centerX: 30.h,
-                                        centerY: 30.h,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 12.h,
-                                      top: 12.h,
-                                      child: Image.asset(
-                                        'assets/main/rabbit.png',
-                                        width: 36.h,
-                                        height: 36.h,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                    child: FutureBuilder(
+                      future: ranking(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              "랭킹 불러오기 실패!",
+                              style: TextStyle(
+                                fontSize: 20.h,
+                                fontFamily: 'SUITE',
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                      ],
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return ((index + 1 < 4) == true)
+                                  ? Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 12.w,
+                                          height: 80.h,
+                                        ),
+                                        Stack(
+                                          children: [
+                                            Text(
+                                              "${index + 1}",
+                                              style: TextStyle(
+                                                fontSize: 10 *
+                                                    (4 - 0.5 * (index + 1)).h,
+                                                fontFamily: 'SUITE',
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 90.w,
+                                            )
+                                          ],
+                                        ),
+                                        Stack(
+                                          children: [
+                                            CustomPaint(
+                                              size: Size(60.h, 60.h),
+                                              painter: CirclePainter(
+                                                radius: 30.h,
+                                                color: Color(0xFFEAF2FF),
+                                                centerX: 30.h,
+                                                centerY: 30.h,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              left: 12.h,
+                                              top: 12.h,
+                                              child: Image.asset(
+                                                'assets/main/rabbit.png',
+                                                width: 36.h,
+                                                height: 36.h,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: 10.w,
+                                        ),
+                                        Stack(
+                                          children: [
+                                            SizedBox(
+                                              width: 150.w,
+                                            ),
+                                            Text(
+                                              "${snapshot.data![index].user_id}",
+                                              style: TextStyle(
+                                                fontSize: 20.h,
+                                                fontFamily: 'SUITE',
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          "${snapshot.data![index].score}",
+                                          style: TextStyle(
+                                            fontSize: 20.h,
+                                            fontFamily: 'SUITE',
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 12.w,
+                                          height: 80.h,
+                                        ),
+                                        Stack(
+                                          children: [
+                                            Text(
+                                              "${index + 1}",
+                                              style: TextStyle(
+                                                fontSize: 20.h,
+                                                fontFamily: 'SUITE',
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 90.w,
+                                            ),
+                                          ],
+                                        ),
+                                        Stack(
+                                          children: [
+                                            CustomPaint(
+                                              size: Size(60.h, 60.h),
+                                              painter: CirclePainter(
+                                                radius: 30.h,
+                                                color: Color(0xFFEAF2FF),
+                                                centerX: 30.h,
+                                                centerY: 30.h,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              left: 12.h,
+                                              top: 12.h,
+                                              child: Image.asset(
+                                                'assets/main/rabbit.png',
+                                                width: 36.h,
+                                                height: 36.h,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: 10.w,
+                                        ),
+                                        Stack(
+                                          children: [
+                                            SizedBox(
+                                              width: 150.w,
+                                            ),
+                                            Text(
+                                              "${snapshot.data![index].user_id}",
+                                              style: TextStyle(
+                                                fontSize: 20.h,
+                                                fontFamily: 'SUITE',
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          "${snapshot.data![index].score}",
+                                          style: TextStyle(
+                                            fontSize: 20.h,
+                                            fontFamily: 'SUITE',
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                            },
+                          );
+                        }
+                      },
                     ),
                   )
                 ],

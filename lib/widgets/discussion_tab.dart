@@ -26,6 +26,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   TextEditingController comment = TextEditingController();
   TextEditingController reply = TextEditingController();
+  ScrollController discussionList = ScrollController();
   late FocusNode focusnodec;
 
   Future<List<GetdiscussionModel>> discussion() async {
@@ -186,7 +187,6 @@ class _DiscusstionTabState extends State<DiscussionTab> {
         FutureBuilder(
           future: discussion(),
           builder: (context, snapshot) {
-            print(likeCount);
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
@@ -208,73 +208,122 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                       width: 393.w,
                       height: 560.h,
                       child: ListView.separated(
-                        itemCount: snapshot.data!.length,
+                        itemCount: snapshot.data!.length + 1,
                         separatorBuilder: (context, index) => SizedBox(
                           height: 8.h,
                         ),
                         itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 15.w,
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 15.w,
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF6F5FF),
-                                    borderRadius: BorderRadius.circular(20.r),
+                          if (index == snapshot.data!.length) {
+                            return SizedBox(
+                                height:
+                                    MediaQuery.of(context).viewInsets.bottom);
+                          } else {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 15.w,
                                   ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      top: 5.h,
-                                      right: 10.w,
-                                      left: 5.h,
+                                  Container(
+                                    width: 345.w,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFF6F5FF),
+                                      borderRadius: BorderRadius.circular(20.r),
                                     ),
                                     child: Row(
                                       children: [
                                         SizedBox(
-                                          width: 67.w,
+                                          width: 13.w,
                                         ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "${snapshot.data![index].user_id}",
+                                        Stack(children: [
+                                          Container(
+                                            width: 42.h,
+                                            height: 42.h,
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFFEAF2FF),
+                                              borderRadius:
+                                                  BorderRadius.circular(42.h),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            left: 7.h,
+                                            top: 7.h,
+                                            child: Image.asset(
+                                              'assets/main/rabbit.png',
+                                              width: 28.h,
+                                              height: 28.h,
+                                            ),
+                                          )
+                                        ]),
+                                        SizedBox(
+                                          width: 12.w,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "${snapshot.data![index].user_id}",
+                                                    style: TextStyle(
+                                                      fontSize: 15.h,
+                                                      fontFamily: 'SUITE',
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5.w,
+                                                  ),
+                                                  Text(
+                                                    timeAgo(snapshot
+                                                        .data![index]
+                                                        .created_date),
+                                                    style: TextStyle(
+                                                      fontSize: 10.h,
+                                                      fontFamily: 'SUITE',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Color(0xFFA6A6A6),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  bottom: 8.h,
+                                                ),
+                                                child: Text(
+                                                  snapshot.data![index].content,
                                                   style: TextStyle(
                                                     fontSize: 15.h,
                                                     fontFamily: 'SUITE',
-                                                    fontWeight: FontWeight.w600,
+                                                    fontWeight: FontWeight.w400,
                                                   ),
+                                                  softWrap: true,
+                                                  maxLines: null,
+                                                  overflow:
+                                                      TextOverflow.visible,
                                                 ),
-                                                SizedBox(
-                                                  width: 5.w,
-                                                ),
-                                                Stack(
-                                                  children: [
-                                                    Text(
-                                                      timeAgo(snapshot
-                                                          .data![index]
-                                                          .created_date),
-                                                      style: TextStyle(
-                                                        fontSize: 10.h,
-                                                        fontFamily: 'SUITE',
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color:
-                                                            Color(0xFFA6A6A6),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 208.w,
-                                                    ),
-                                                  ],
-                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 5.w,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
                                                 GestureDetector(
                                                   onTap: () {
                                                     fetchcommentlike(snapshot
@@ -301,24 +350,21 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                                 SizedBox(
                                                   width: 2.w,
                                                 ),
-                                                Stack(children: [
-                                                  SizedBox(
-                                                    width: 15.w,
+                                                Text(
+                                                  "${snapshot.data![index].like}",
+                                                  style: TextStyle(
+                                                    fontSize: 10.h,
+                                                    fontFamily: 'SUITE',
+                                                    fontWeight: FontWeight.w400,
                                                   ),
-                                                  Text(
-                                                    "${snapshot.data![index].like}",
-                                                    style: TextStyle(
-                                                      fontSize: 10.h,
-                                                      fontFamily: 'SUITE',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                ]),
+                                                ),
                                               ],
                                             ),
+                                            SizedBox(
+                                              height: 5.h,
+                                            ),
                                             Text(
-                                              snapshot.data![index].content,
+                                              "답글",
                                               style: TextStyle(
                                                 fontSize: 15.h,
                                                 fontFamily: 'SUITE',
@@ -327,13 +373,16 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                             ),
                                           ],
                                         ),
+                                        SizedBox(
+                                          width: 20.w,
+                                        )
                                       ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
+                                ],
+                              ),
+                            );
+                          }
                         },
                       ),
                     ),

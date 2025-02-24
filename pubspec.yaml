@@ -28,6 +28,7 @@ flutter:
     - assets/shop/
     - assets/theme/
     - assets/images/
+    - assets/login/
   
   fonts:
     - family: SUITE
