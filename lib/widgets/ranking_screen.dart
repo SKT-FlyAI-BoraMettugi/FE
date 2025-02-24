@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:FE/widgets/circle_painter.dart';
 import 'package:FE/widgets/getranking_model.dart';
+import 'package:FE/widgets/getuser_model.dart';
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,6 +27,41 @@ Future<List<GetrankingModel>> ranking() async {
     return rankingInstances;
   }
   throw Error();
+}
+
+Future<GetuserModel> userinfo(int userId) async {
+  final response = await http.get(Uri.parse(
+      'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/$userId'));
+  if (response.statusCode == 200) {
+    final decodedbody = utf8.decode(response.bodyBytes);
+    final Map<String, dynamic> infos = jsonDecode(decodedbody);
+    GetuserModel info = GetuserModel.fromJson(infos);
+    return info;
+  }
+  throw Error();
+}
+
+Future<List<Map<String, dynamic>>> fetchRankingWithUserInfo() async {
+  final rankings = await ranking(); // 랭킹 정보 가져오기
+
+  // 모든 유저 정보를 병렬로 가져오기
+  final userInfos = await Future.wait(
+    rankings.map(
+      (rank) {
+        return userinfo(rank.user_id);
+      },
+    ),
+  );
+
+  // 랭킹 정보와 유저 정보를 매핑
+  return List.generate(rankings.length, (index) {
+    return {
+      "rank": rankings[index].rank,
+      "score": rankings[index].score,
+      "userId": rankings[index].user_id,
+      "userName": userInfos[index].nickname,
+    };
+  });
 }
 
 class _RankingScreenState extends State<RankingScreen> {
@@ -164,7 +200,7 @@ class _RankingScreenState extends State<RankingScreen> {
                     width: 383.w,
                     height: 566.h,
                     child: FutureBuilder(
-                      future: ranking(),
+                      future: fetchRankingWithUserInfo(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -240,7 +276,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                               width: 150.w,
                                             ),
                                             Text(
-                                              "${snapshot.data![index].user_id}",
+                                              "${snapshot.data![index]['userName']}",
                                               style: TextStyle(
                                                 fontSize: 20.h,
                                                 fontFamily: 'SUITE',
@@ -250,7 +286,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                           ],
                                         ),
                                         Text(
-                                          "${snapshot.data![index].score}",
+                                          "${snapshot.data![index]['score']}",
                                           style: TextStyle(
                                             fontSize: 20.h,
                                             fontFamily: 'SUITE',
@@ -311,7 +347,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                               width: 150.w,
                                             ),
                                             Text(
-                                              "${snapshot.data![index].user_id}",
+                                              "${snapshot.data![index]['userName']}",
                                               style: TextStyle(
                                                 fontSize: 20.h,
                                                 fontFamily: 'SUITE',
@@ -321,7 +357,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                           ],
                                         ),
                                         Text(
-                                          "${snapshot.data![index].score}",
+                                          "${snapshot.data![index]['score']}",
                                           style: TextStyle(
                                             fontSize: 20.h,
                                             fontFamily: 'SUITE',

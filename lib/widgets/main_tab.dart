@@ -3,11 +3,23 @@ import 'package:FE/widgets/ranking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class MainTab extends StatelessWidget {
+class MainTab extends StatefulWidget {
+  final int userrank;
+  final int score;
+  final String nickname;
+
   const MainTab({
     super.key,
+    required this.userrank,
+    required this.score,
+    required this.nickname,
   });
 
+  @override
+  State<MainTab> createState() => _MainTabState();
+}
+
+class _MainTabState extends State<MainTab> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -30,7 +42,7 @@ class MainTab extends StatelessWidget {
               width: 11.w,
             ),
             Text(
-              "3등",
+              "${widget.userrank}등",
               style: TextStyle(
                 letterSpacing: 0.5,
                 fontSize: 15.h,
@@ -153,7 +165,7 @@ class MainTab extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "이동현",
+                        widget.nickname,
                         style: TextStyle(
                           letterSpacing: 0.5,
                           fontSize: 15.h,
@@ -199,7 +211,7 @@ class MainTab extends StatelessWidget {
                         width: 164.w - 27.h,
                       ),
                       Text(
-                        "1위",
+                        "${widget.userrank}등",
                         style: TextStyle(
                           letterSpacing: 0.5,
                           fontSize: 15.h,
@@ -230,7 +242,7 @@ class MainTab extends StatelessWidget {
                         width: 164.w - 58.h,
                       ),
                       Text(
-                        "781",
+                        "${widget.score}",
                         style: TextStyle(
                           letterSpacing: 0.5,
                           fontSize: 15.h,

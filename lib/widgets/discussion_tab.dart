@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:FE/widgets/getcomment_model.dart';
 import 'package:FE/widgets/getlike_model.dart';
 import 'package:FE/widgets/getresult_model.dart';
 import 'package:flutter/services.dart';
@@ -21,7 +22,6 @@ class DiscussionTab extends StatefulWidget {
 
 class _DiscusstionTabState extends State<DiscussionTab> {
   int totalScore = 0;
-  late Map<int, int> likeCount = {};
   late int likereply;
 
   TextEditingController comment = TextEditingController();
@@ -29,7 +29,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   ScrollController discussionList = ScrollController();
   late FocusNode focusnodec;
 
-  Future<List<GetdiscussionModel>> discussion() async {
+  Future<List<GetdiscussionModel>> getdiscussion() async {
     List<GetdiscussionModel> discussionInstances = [];
 
     final response = await http.get(
@@ -41,13 +41,23 @@ class _DiscusstionTabState extends State<DiscussionTab> {
       final List<dynamic> discussions = jsonDecode(decodedbody);
       for (var discussion in discussions) {
         discussionInstances.add(GetdiscussionModel.fromJson(discussion));
-        if (!likeCount.containsKey(
-            GetdiscussionModel.fromJson(discussion).discussion_id)) {
-          fetchcommentlike(
-              GetdiscussionModel.fromJson(discussion).discussion_id);
-        }
       }
       return discussionInstances;
+    }
+    throw Error();
+  }
+
+  Future<List<GetcommentModel>> getcomment(int discussionId) async {
+    List<GetcommentModel> commentInstances = [];
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/$discussionId'));
+    if (response.statusCode == 200) {
+      String decodedbody = utf8.decode(response.bodyBytes);
+      final List<dynamic> comments = jsonDecode(decodedbody);
+      for (var comment in comments) {
+        commentInstances.add(GetcommentModel.fromJson(comment));
+      }
+      return commentInstances;
     }
     throw Error();
   }
@@ -63,7 +73,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
           GetresultModel.fromJson(jsonDecode(decodedbody));
       return score.total_score;
     }
-    throw Error();
+    return 40;
   }
 
   void fetchscore() async {
@@ -124,9 +134,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   void fetchcommentlike(int discussionId) async {
     final like = await commentlike(discussionId);
-    setState(() {
-      likeCount[discussionId] = like;
-    });
+    setState(() {});
   }
 
   void fetchreplylike(int commentId) async {
@@ -138,7 +146,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   Future<Map<String, dynamic>> fetchData() async {
     final responses = await Future.wait([
-      discussion(),
+      getdiscussion(),
     ]);
 
     return {
@@ -185,7 +193,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     return Stack(
       children: [
         FutureBuilder(
-          future: discussion(),
+          future: getdiscussion(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -330,10 +338,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                                         .data![index]
                                                         .discussion_id);
                                                   },
-                                                  child: (likeCount[snapshot
-                                                              .data![index]
-                                                              .discussion_id] ==
-                                                          0)
+                                                  child: (0 == 0)
                                                       ? Icon(
                                                           Icons.favorite_border,
                                                           size: 14.h,

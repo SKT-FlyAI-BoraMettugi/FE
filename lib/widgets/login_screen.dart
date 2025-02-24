@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:FE/main.dart';
+import 'package:FE/widgets/getloginstat_model.dart';
 import 'package:FE/widgets/geturl_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +17,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late String url;
+  late int userId;
+  String? accessToken;
 
   Future<String> kakaourl() async {
     final response = await http.get(Uri.parse(
@@ -29,10 +31,32 @@ class _LoginScreenState extends State<LoginScreen> {
     throw Error();
   }
 
+  Future<int> loginstat(String code) async {
+    final response = await http.patch(
+        Uri.parse('http://nolly.ap-northeast-2.elasticbeanstalk.com'),
+        body: {
+          "code": code,
+        });
+    if (response.statusCode == 200) {
+      final decodedbody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> stats = jsonDecode(decodedbody);
+      final GetloginstatModel stat = GetloginstatModel.fromJson(stats);
+      return stat.user_id;
+    }
+    throw Error();
+  }
+
   void fetchurl() async {
     final futureurl = await kakaourl();
     setState(() {
       url = futureurl;
+    });
+  }
+
+  void fetchuser(String code) async {
+    final futureuser = await loginstat(code);
+    setState(() {
+      userId = futureuser;
     });
   }
 
@@ -84,11 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: () {
                         Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MainPage(),
-                          ),
-                        );
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MainPage()));
                       },
                       child: Image.asset(
                         'assets/login/kakao_login_large_narrow.png',
@@ -99,6 +121,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 20.h,
                     ),
+                    if (accessToken != null) ...[
+                      SizedBox(
+                        height: 20.h,
+                        child: Text(accessToken!),
+                      ),
+                    ]
                   ],
                 ),
               ),
