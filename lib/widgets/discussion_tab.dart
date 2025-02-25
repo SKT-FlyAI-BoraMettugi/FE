@@ -23,13 +23,6 @@ class DiscussionTab extends StatefulWidget {
 
 class _DiscusstionTabState extends State<DiscussionTab> {
   int totalScore = 0;
-  late int likediscussion;
-  late int likecomment;
-
-  TextEditingController discussion = TextEditingController();
-  TextEditingController comment = TextEditingController();
-  ScrollController discussionList = ScrollController();
-  late FocusNode focusnodec;
 
   Future<List<GetdiscussionModel>> getdiscussion() async {
     List<GetdiscussionModel> discussionInstances = [];
@@ -44,6 +37,8 @@ class _DiscusstionTabState extends State<DiscussionTab> {
       for (var discussion in discussions) {
         discussionInstances.add(GetdiscussionModel.fromJson(discussion));
       }
+      return discussionInstances;
+    } else if (response.statusCode == 404) {
       return discussionInstances;
     }
     throw Error();
@@ -60,6 +55,43 @@ class _DiscusstionTabState extends State<DiscussionTab> {
         commentInstances.add(GetcommentModel.fromJson(comment));
       }
       return commentInstances;
+    } else if (response.statusCode == 404) {
+      return commentInstances;
+    }
+    throw Error();
+  }
+
+  Future<List<GetdiscussionModel>> getuserlikediscussion() async {
+    List<GetdiscussionModel> discussionlikeInstances = [];
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/1'));
+    if (response.statusCode == 200) {
+      String decodedbody = utf8.decode(response.bodyBytes);
+      final List<dynamic> discussionlikes = jsonDecode(decodedbody);
+      for (var discussionlike in discussionlikes) {
+        discussionlikeInstances
+            .add(GetdiscussionModel.fromJson(discussionlike));
+      }
+      return discussionlikeInstances;
+    } else if (response.statusCode == 404) {
+      return discussionlikeInstances;
+    }
+    throw Error();
+  }
+
+  Future<List<GetcommentModel>> getuserlikecomment() async {
+    List<GetcommentModel> commentlikeInstances = [];
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/like/1'));
+    if (response.statusCode == 200) {
+      String decodedbody = utf8.decode(response.bodyBytes);
+      final List<dynamic> commentlikes = jsonDecode(decodedbody);
+      for (var commentlike in commentlikes) {
+        commentlikeInstances.add(GetcommentModel.fromJson(commentlike));
+      }
+      return commentlikeInstances;
+    } else if (response.statusCode == 404) {
+      return commentlikeInstances;
     }
     throw Error();
   }
@@ -85,34 +117,6 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     });
   }
 
-  Future<void> postdiscussion() async {
-    await http.post(
-      Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/1/${widget.questionID}'),
-      body: utf8.encode(
-        jsonEncode(
-          {
-            "content": discussion.text,
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> postcomment(int discussionId) async {
-    await http.post(
-      Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/1/$discussionId'),
-      body: utf8.encode(
-        jsonEncode(
-          {
-            "content": comment.text,
-          },
-        ),
-      ),
-    );
-  }
-
   Future<int> discussionlike(int discussionId) async {
     final response = await http.patch(Uri.parse(
         'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/$discussionId/1'));
@@ -129,39 +133,126 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   Future<int> commentlike(int commentId) async {
     final response = await http.patch(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/comment/like/$commentId/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/like/$commentId/1'));
     if (response.statusCode == 200) {
-      final Map<String, int> replylikes = jsonDecode(response.body);
-      final GetlikeModel replylike = GetlikeModel.fromJson(replylikes);
-      return replylike.like;
+      final Map<String, dynamic> commentlikes = jsonDecode(response.body);
+      final GetlikeModel commentlike = GetlikeModel.fromJson(commentlikes);
+      return commentlike.like;
     }
     throw Error();
   }
 
-  void fetchdiscussionlike(int discussionId) async {
-    final like = await commentlike(discussionId);
+  List<GetdiscussionModel> discussions = [];
+  Map<int, List<GetcommentModel>> comments = {};
+  Set<int> likedDiscussions = {};
+  Set<int> likedComments = {};
+  Set<int> expandedDiscussions = {}; // 답글 펼쳐진 댓글 ID 저장
+  Map<int, int> discussionLikes = {};
+  Map<int, int> commentLikes = {};
+  TextEditingController discussionController = TextEditingController();
+  Map<int, TextEditingController> commentControllers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    fetchscore();
+  }
+
+  Future<void> fetchData() async {
+    discussions = await getdiscussion();
+    var likedDiscussionList = await getuserlikediscussion();
+    var likedCommentList = await getuserlikecomment();
+
+    likedDiscussions = likedDiscussionList.map((e) => e.discussion_id).toSet();
+    likedComments = likedCommentList.map((e) => e.comment_id).toSet();
+
+    for (var discussion in discussions) {
+      discussionLikes[discussion.discussion_id] = discussion.like;
+    }
+
+    for (var comment in likedCommentList) {
+      commentLikes[comment.comment_id] = comment.like;
+    }
+
+    setState(() {});
+  }
+
+  Future<void> postdiscussion() async {
+    if (discussionController.text.isEmpty) return;
+    await http.post(
+      Uri.parse(
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/1/${widget.questionID}'),
+      body: utf8.encode(jsonEncode({"content": discussionController.text})),
+    );
+    discussionController.clear();
+    fetchData();
+  }
+
+  Future<void> postcomment(int discussionId) async {
+    if (commentControllers[discussionId]!.text.isEmpty) return;
+    await http.post(
+      Uri.parse(
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/1/$discussionId'),
+      body: utf8.encode(
+          jsonEncode({"content": commentControllers[discussionId]!.text})),
+    );
+    commentControllers[discussionId]!.clear();
+    comments[discussionId] = await getcomment(discussionId);
+    setState(() {});
+  }
+
+  Future<void> toggleDiscussionLike(int discussionId) async {
+    int updatedLike = await discussionlike(discussionId);
     setState(() {
-      likediscussion = like;
+      discussionLikes[discussionId] = updatedLike;
+      if (updatedLike == 1) {
+        likedDiscussions.add(discussionId);
+      } else {
+        likedDiscussions.remove(discussionId);
+      }
     });
   }
 
-  void fetchcommentlike(int commentId) async {
-    final like = await commentlike(commentId);
-    setState(() {
-      likecomment = like;
-    });
+  Future<void> toggleCommentLike(int commentId) async {
+    try {
+      int updatedLike = await commentlike(commentId);
+
+      setState(() {
+        commentLikes[commentId] = updatedLike;
+
+        if (updatedLike > 0) {
+          likedComments.add(commentId);
+        } else {
+          likedComments.remove(commentId);
+        }
+      });
+    } catch (e) {
+      print("❌ 답글 좋아요 처리 중 오류 발생: $e");
+    }
   }
 
-  Future<Map<String, dynamic>> fetchData() async {
-    final responses = await Future.wait([
-      getdiscussion(),
-    ]);
+  void toggleExpand(int discussionId) async {
+    if (expandedDiscussions.contains(discussionId)) {
+      setState(() {
+        expandedDiscussions.remove(discussionId);
+      });
+    } else {
+      try {
+        List<GetcommentModel> fetchedComments = await getcomment(discussionId);
 
-    return {
-      'api1': responses[0],
-      'api2': responses[1],
-      'api3': responses[2],
-    };
+        setState(() {
+          expandedDiscussions.add(discussionId);
+          comments[discussionId] = fetchedComments;
+
+          for (var comment in fetchedComments) {
+            commentLikes[comment.comment_id] = comment.like;
+          }
+        });
+      } catch (e) {
+        print("❌ 답글 불러오기 실패: $e");
+      }
+    }
   }
 
   String timeAgo(String dateTimeString) {
@@ -169,604 +260,266 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     DateTime now = DateTime.now();
     Duration difference = now.difference(commentTime);
 
-    if (difference.inSeconds < 60) {
-      return '${difference.inSeconds}초 전';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}분 전';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}시간 전';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}일 전';
-    } else {
-      return DateFormat('yyyy-MM-dd').format(commentTime); // 1주 이상이면 날짜 표시
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchscore();
-    focusnodec = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    discussion.dispose();
-    comment.dispose();
-    focusnodec.dispose();
-    super.dispose();
+    if (difference.inSeconds < 60) return '${difference.inSeconds}초 전';
+    if (difference.inMinutes < 60) return '${difference.inMinutes}분 전';
+    if (difference.inHours < 24) return '${difference.inHours}시간 전';
+    if (difference.inDays < 7) return '${difference.inDays}일 전';
+    return DateFormat('yyyy-MM-dd').format(commentTime);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        FutureBuilder(
-          future: getdiscussion(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError | (snapshot.data == null)) {
-              return Center(
-                child: Text(
-                  "진행중인 토론이 없습니다.",
-                  style: TextStyle(
-                    fontSize: 20.h,
-                    fontFamily: 'SUITE',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
-            } else {
-              if (totalScore >= 35) {
-                return Column(
-                  children: [
-                    SizedBox(
-                      width: 393.w,
-                      height: 560.h,
-                      child: ListView.separated(
-                        itemCount: snapshot.data!.length + 1,
-                        separatorBuilder: (context, index) => SizedBox(
-                          height: 8.h,
-                        ),
-                        itemBuilder: (context, index) {
-                          if (index == snapshot.data!.length) {
-                            return SizedBox(
-                                height:
-                                    MediaQuery.of(context).viewInsets.bottom);
-                          } else {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 15.w,
-                                      ),
-                                      Container(
-                                        width: 345.w,
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFFF6F5FF),
-                                          borderRadius:
-                                              BorderRadius.circular(20.r),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 13.w,
-                                            ),
-                                            Stack(children: [
-                                              Container(
-                                                width: 42.h,
-                                                height: 42.h,
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xFFEAF2FF),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          42.h),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 7.h,
-                                                top: 7.h,
-                                                child: Image.asset(
-                                                  'assets/main/rabbit.png',
-                                                  width: 28.h,
-                                                  height: 28.h,
-                                                ),
-                                              )
-                                            ]),
-                                            SizedBox(
-                                              width: 12.w,
-                                            ),
-                                            SizedBox(
-                                              width: 230.w,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        "${snapshot.data![index].user_id}",
-                                                        style: TextStyle(
-                                                          fontSize: 15.h,
-                                                          fontFamily: 'SUITE',
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 5.w,
-                                                      ),
-                                                      Text(
-                                                        timeAgo(snapshot
-                                                            .data![index]
-                                                            .created_date),
-                                                        style: TextStyle(
-                                                          fontSize: 10.h,
-                                                          fontFamily: 'SUITE',
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          color:
-                                                              Color(0xFFA6A6A6),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                      bottom: 8.h,
-                                                    ),
-                                                    child: Text(
-                                                      snapshot
-                                                          .data![index].content,
-                                                      style: TextStyle(
-                                                        fontSize: 15.h,
-                                                        fontFamily: 'SUITE',
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                      softWrap: true,
-                                                      maxLines: null,
-                                                      overflow:
-                                                          TextOverflow.visible,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 5.w,
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  height: 10.h,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        fetchdiscussionlike(
-                                                            snapshot
-                                                                .data![index]
-                                                                .discussion_id);
-                                                      },
-                                                      child: (0 == 0)
-                                                          ? Icon(
-                                                              Icons
-                                                                  .favorite_border,
-                                                              size: 14.h,
-                                                              color: Color(
-                                                                  0xFF006FFD),
-                                                            )
-                                                          : Icon(
-                                                              Icons.favorite,
-                                                              size: 14.h,
-                                                              color: Color(
-                                                                  0xFF006FFD),
-                                                            ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 2.w,
-                                                    ),
-                                                    Text(
-                                                      "${snapshot.data![index].like}",
-                                                      style: TextStyle(
-                                                        fontSize: 10.h,
-                                                        fontFamily: 'SUITE',
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 5.h,
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    comment.text =
-                                                        discussion.text;
-                                                    postcomment(snapshot
-                                                        .data![index]
-                                                        .discussion_id);
-                                                    discussion.clear();
-                                                    comment.clear();
-                                                  },
-                                                  child: Text(
-                                                    "답글",
-                                                    style: TextStyle(
-                                                      fontSize: 15.h,
-                                                      fontFamily: 'SUITE',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  FutureBuilder(
-                                    future: getcomment(
-                                        snapshot.data![index].discussion_id),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasError |
-                                          (snapshot.data == null)) {
-                                        return SizedBox(
-                                          height: 0.h,
-                                        );
-                                      } else {
-                                        return Padding(
-                                          padding: EdgeInsets.only(
-                                            top: 8.h,
-                                            left: 16.w,
-                                          ),
-                                          child: SizedBox(
-                                            width: 340.w,
-                                            height: 100.h,
-                                            child: ListView.builder(
-                                              scrollDirection: Axis.horizontal,
-                                              itemCount: snapshot.data!.length,
-                                              itemBuilder: (context, index) {
-                                                return Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(
-                                                      width: 33.w,
-                                                    ),
-                                                    Container(
-                                                      width: 310.w,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Color(0xFFF6F5FF),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20.r),
-                                                      ),
-                                                      child: Row(
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 13.w,
-                                                          ),
-                                                          Stack(children: [
-                                                            Container(
-                                                              width: 42.h,
-                                                              height: 42.h,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xFFEAF2FF),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            42.h),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              left: 7.h,
-                                                              top: 7.h,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/main/rabbit.png',
-                                                                width: 28.h,
-                                                                height: 28.h,
-                                                              ),
-                                                            )
-                                                          ]),
-                                                          SizedBox(
-                                                            width: 12.w,
-                                                          ),
-                                                          SizedBox(
-                                                            width: 215.w,
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                SizedBox(
-                                                                  height: 5.h,
-                                                                ),
-                                                                Row(
-                                                                  children: [
-                                                                    Text(
-                                                                      "${snapshot.data![index].comment_id}",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            15.h,
-                                                                        fontFamily:
-                                                                            'SUITE',
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width:
-                                                                          5.w,
-                                                                    ),
-                                                                    Text(
-                                                                      timeAgo(snapshot
-                                                                          .data![
-                                                                              index]
-                                                                          .created_date),
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            10.h,
-                                                                        fontFamily:
-                                                                            'SUITE',
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xFFA6A6A6),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .only(
-                                                                    bottom: 8.h,
-                                                                  ),
-                                                                  child: Text(
-                                                                    snapshot
-                                                                        .data![
-                                                                            index]
-                                                                        .content,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          15.h,
-                                                                      fontFamily:
-                                                                          'SUITE',
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400,
-                                                                    ),
-                                                                    softWrap:
-                                                                        true,
-                                                                    maxLines:
-                                                                        null,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .visible,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            width: 5.w,
-                                                          ),
-                                                          Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              SizedBox(
-                                                                height: 10.h,
-                                                              ),
-                                                              Row(
-                                                                children: [
-                                                                  GestureDetector(
-                                                                    onTap: () {
-                                                                      fetchcommentlike(snapshot
-                                                                          .data![
-                                                                              index]
-                                                                          .comment_id);
-                                                                    },
-                                                                    child: (0 ==
-                                                                            0)
-                                                                        ? Icon(
-                                                                            Icons.favorite_border,
-                                                                            size:
-                                                                                14.h,
-                                                                            color:
-                                                                                Color(0xFF006FFD),
-                                                                          )
-                                                                        : Icon(
-                                                                            Icons.favorite,
-                                                                            size:
-                                                                                14.h,
-                                                                            color:
-                                                                                Color(0xFF006FFD),
-                                                                          ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 2.w,
-                                                                  ),
-                                                                  Text(
-                                                                    "${snapshot.data![index].like}",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          10.h,
-                                                                      fontFamily:
-                                                                          'SUITE',
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5.h,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  )
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              } else {
-                return Center(
-                  child: Text(
-                    "토론은 문제를 푼 이후에 확인 가능합니다.",
-                    style: TextStyle(
-                      fontSize: 20.h,
-                      fontFamily: 'SUITE',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                );
-              }
-            }
-          },
+    if (totalScore < 36) {
+      return Center(
+        child: Text(
+          "토론에 참여하기 위해서는 문제를 풀어야 합니다.",
+          style: TextStyle(
+            fontSize: 20.h,
+            fontFamily: 'SUITE',
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        SizedBox(
-          height: 10.h,
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
+      );
+    } else {
+      return Scaffold(
+        backgroundColor: Color(0xFFEEEDF1),
+        body: SizedBox(
+          width: 393.w,
+          height: 630.h,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: 70.w,
-                  ),
-                  Container(
-                    width: 298.w,
-                    height: 46.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15.w,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 230.w,
-                            height: 46.h,
-                            child: TextField(
-                              showCursor: true,
-                              textAlignVertical: TextAlignVertical.center,
-                              minLines: 1,
-                              maxLines: 3,
-                              keyboardType: TextInputType.multiline,
-                              decoration: InputDecoration(
-                                hintText:
-                                    "${widget.theme_name} 문제 ${widget.questionID}번에 의견 남기기",
-                                hintStyle: TextStyle(
-                                  fontSize: 15.h,
-                                  fontFamily: 'SUITE',
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFFA6A6A6),
-                                ),
-                                border: InputBorder.none,
-                              ),
-                              controller: discussion,
+              Expanded(
+                child: ListView.builder(
+                  itemCount: discussions.length,
+                  itemBuilder: (context, index) {
+                    var discussion = discussions[index];
+                    commentControllers.putIfAbsent(discussion.discussion_id,
+                        () => TextEditingController());
+                    bool isExpanded =
+                        expandedDiscussions.contains(discussion.discussion_id);
+
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 5.h,
+                          ),
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            tileColor: Color(0xFFF6F5FF),
+                            leading: Image.asset('assets/main/rabbit.png'),
+                            title: Text(
+                              discussion.content,
                               style: TextStyle(
                                 fontSize: 15.h,
                                 fontFamily: 'SUITE',
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 5.w,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (discussion.text.isNotEmpty == true) {
-                                FocusScope.of(context).unfocus();
-                                SystemChrome.setEnabledSystemUIMode(
-                                    SystemUiMode.immersiveSticky);
-                                postdiscussion();
-                                discussion.clear();
-                              }
-                            },
-                            child: Container(
-                              width: 38.h,
-                              height: 38.h,
-                              decoration: BoxDecoration(
-                                color: Color(0xFFB1B2FF),
-                                borderRadius: BorderRadius.circular(12.h),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.send_outlined,
-                                  size: 24.h,
-                                  color: Colors.white,
-                                ),
+                            subtitle: Text(
+                              timeAgo(discussion.created_date),
+                              style: TextStyle(
+                                fontSize: 10.h,
+                                fontFamily: 'SUITE',
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: Duration(milliseconds: 300),
+                                  child: IconButton(
+                                    key: ValueKey(likedDiscussions
+                                        .contains(discussion.discussion_id)),
+                                    icon: Icon(
+                                      likedDiscussions.contains(
+                                              discussion.discussion_id)
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color: likedDiscussions.contains(
+                                              discussion.discussion_id)
+                                          ? Colors.red
+                                          : null,
+                                    ),
+                                    onPressed: () => toggleDiscussionLike(
+                                        discussion.discussion_id),
+                                  ),
+                                ),
+                                Text(
+                                    '${discussionLikes[discussion.discussion_id] ?? 0}'),
+                                IconButton(
+                                  icon: Icon(isExpanded
+                                      ? Icons.expand_less
+                                      : Icons.expand_more),
+                                  onPressed: () =>
+                                      toggleExpand(discussion.discussion_id),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                        ),
+                        if (isExpanded)
+                          Padding(
+                            padding: EdgeInsets.only(left: 30),
+                            child: Column(
+                              children: [
+                                if (comments.containsKey(
+                                        discussion.discussion_id) &&
+                                    comments[discussion.discussion_id]!
+                                        .isNotEmpty)
+                                  ...comments[discussion.discussion_id]!
+                                      .map((comment) => Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 3.h,
+                                            ),
+                                            child: ListTile(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20.r),
+                                              ),
+                                              tileColor: Color(0xFFF6F5FF),
+                                              leading: Image.asset(
+                                                  'assets/main/rabbit.png'),
+                                              title: Text(comment.content),
+                                              subtitle: Text(timeAgo(
+                                                  comment.created_date)),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  AnimatedSwitcher(
+                                                    duration: Duration(
+                                                        milliseconds: 300),
+                                                    child: IconButton(
+                                                      key: ValueKey(
+                                                          likedComments
+                                                              .contains(comment
+                                                                  .comment_id)),
+                                                      icon: Icon(
+                                                        likedComments.contains(
+                                                                comment
+                                                                    .comment_id)
+                                                            ? Icons.favorite
+                                                            : Icons
+                                                                .favorite_border,
+                                                        color: likedComments
+                                                                .contains(comment
+                                                                    .comment_id)
+                                                            ? Colors.red
+                                                            : null,
+                                                      ),
+                                                      onPressed: () =>
+                                                          toggleCommentLike(
+                                                              comment
+                                                                  .comment_id),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                      '${commentLikes[comment.comment_id] ?? 0}'),
+                                                ],
+                                              ),
+                                            ),
+                                          )),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 30.w,
+                                    top: 2.h,
+                                  ),
+                                  child: Container(
+                                    width: 300.w,
+                                    height: 46.h,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20.r),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 10.w,
+                                        ),
+                                        Expanded(
+                                          child: TextField(
+                                            minLines: 1,
+                                            maxLines: null,
+                                            controller: commentControllers[
+                                                discussion.discussion_id],
+                                            decoration: InputDecoration(
+                                              hintText: "답글을 입력하세요",
+                                              hintStyle: TextStyle(
+                                                fontSize: 15.h,
+                                                fontFamily: 'SUITE',
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xFFA6A6A6),
+                                              ),
+                                              border: InputBorder.none,
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.send),
+                                          onPressed: () => postcomment(
+                                              discussion.discussion_id),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
-              (MediaQuery.of(context).viewInsets.bottom != 0)
-                  ? SizedBox(
-                      height: MediaQuery.of(context).viewInsets.bottom - 90,
-                    )
-                  : SizedBox(
-                      height: 0,
-                    ),
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 50.w,
+                  top: 10.h,
+                ),
+                child: Container(
+                  width: 300.w,
+                  height: 46.h,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                      Expanded(
+                        child: TextField(
+                          minLines: 1,
+                          maxLines: null,
+                          controller: discussionController,
+                          decoration: InputDecoration(
+                            hintText: "토론을 생성하세요",
+                            hintStyle: TextStyle(
+                              fontSize: 15.h,
+                              fontFamily: 'SUITE',
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFFA6A6A6),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: postdiscussion,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-      ],
-    );
+      );
+    }
   }
 }
