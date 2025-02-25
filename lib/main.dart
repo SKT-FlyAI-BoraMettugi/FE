@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:FE/widgets/elipse_painter.dart';
 import 'package:FE/widgets/exam_tab.dart';
 import 'package:FE/widgets/getranking_model.dart';
 import 'package:FE/widgets/getuser_model.dart';

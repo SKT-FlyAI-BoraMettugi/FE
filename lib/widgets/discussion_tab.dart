@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:FE/widgets/getcomment_model.dart';
 import 'package:FE/widgets/getlike_model.dart';
 import 'package:FE/widgets/getresult_model.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/getdiscussion_model.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +10,15 @@ import 'package:http/http.dart' as http;
 
 class DiscussionTab extends StatefulWidget {
   final int questionID;
+  final int themeID;
   final String theme_name;
 
-  const DiscussionTab(
-      {super.key, required this.questionID, required this.theme_name});
+  const DiscussionTab({
+    super.key,
+    required this.questionID,
+    required this.theme_name,
+    required this.themeID,
+  });
 
   @override
   State<DiscussionTab> createState() => _DiscusstionTabState();
@@ -92,6 +95,16 @@ class _DiscusstionTabState extends State<DiscussionTab> {
       return commentlikeInstances;
     } else if (response.statusCode == 404) {
       return commentlikeInstances;
+    }
+    throw Error();
+  }
+
+  Future<String> getbadge() async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/badges/1/${widget.themeID}'));
+    if (response.statusCode == 200) {
+      String decodedbody = utf8.decode(response.bodyBytes);
+      return decodedbody;
     }
     throw Error();
   }
@@ -309,7 +322,54 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                               borderRadius: BorderRadius.circular(20.r),
                             ),
                             tileColor: Color(0xFFF6F5FF),
-                            leading: Image.asset('assets/main/rabbit.png'),
+                            leading: Stack(
+                              children: [
+                                Image.asset(
+                                  'assets/main/rabbit.png',
+                                  width: 42.h,
+                                  height: 42.h,
+                                ),
+                                Positioned(
+                                  top: 22.h,
+                                  left: 24.h,
+                                  child: FutureBuilder(
+                                    future: getbadge(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return SizedBox(
+                                          width: 0.h,
+                                        );
+                                      } else {
+                                        if (snapshot.data == null) {
+                                          return SizedBox(
+                                            width: 0.h,
+                                          );
+                                        } else if (snapshot.data! == "동") {
+                                          return Image.asset(
+                                            'assets/badge/bronze.png',
+                                            width: 20.h,
+                                            height: 20.h,
+                                          );
+                                        } else if (snapshot.data! == "은") {
+                                          return Image.asset(
+                                            'assets/badge/silver.png',
+                                            width: 20.h,
+                                            height: 20.h,
+                                          );
+                                        } else {
+                                          return Image.asset(
+                                            'assets/badge/gold.png',
+                                            width: 20.h,
+                                            height: 20.h,
+                                          );
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                             title: Text(
                               discussion.content,
                               style: TextStyle(
@@ -381,8 +441,62 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                                     BorderRadius.circular(20.r),
                                               ),
                                               tileColor: Color(0xFFF6F5FF),
-                                              leading: Image.asset(
-                                                  'assets/main/rabbit.png'),
+                                              leading: Stack(
+                                                children: [
+                                                  Image.asset(
+                                                    'assets/main/rabbit.png',
+                                                    width: 42.h,
+                                                    height: 42.h,
+                                                  ),
+                                                  Positioned(
+                                                    top: 22.h,
+                                                    left: 24.h,
+                                                    child: FutureBuilder(
+                                                      future: getbadge(),
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        if (snapshot
+                                                                .connectionState ==
+                                                            ConnectionState
+                                                                .waiting) {
+                                                          return SizedBox(
+                                                            width: 0.h,
+                                                          );
+                                                        } else {
+                                                          if (snapshot.data ==
+                                                              null) {
+                                                            return SizedBox(
+                                                              width: 0.h,
+                                                            );
+                                                          } else if (snapshot
+                                                                  .data! ==
+                                                              "동") {
+                                                            return Image.asset(
+                                                              'assets/badge/bronze.png',
+                                                              width: 20.h,
+                                                              height: 20.h,
+                                                            );
+                                                          } else if (snapshot
+                                                                  .data! ==
+                                                              "은") {
+                                                            return Image.asset(
+                                                              'assets/badge/silver.png',
+                                                              width: 20.h,
+                                                              height: 20.h,
+                                                            );
+                                                          } else {
+                                                            return Image.asset(
+                                                              'assets/badge/gold.png',
+                                                              width: 20.h,
+                                                              height: 20.h,
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                               title: Text(comment.content),
                                               subtitle: Text(timeAgo(
                                                   comment.created_date)),
