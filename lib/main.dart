@@ -12,8 +12,11 @@ import 'package:FE/widgets/mypage_tab.dart';
 import 'package:FE/widgets/shop_tab.dart';
 import 'package:FE/widgets/theme_tab.dart';
 import 'package:http/http.dart' as http;
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  KakaoSdk.init(nativeAppKey: "3896bb79a2e48c79bb9f994f3feb9482");
   runApp(MyApp());
 }
 

@@ -10,9 +10,14 @@ import 'package:http/http.dart' as http;
 class Detailtheme extends StatefulWidget {
   final int theme_id;
   final String theme_name;
+  final String background_img;
 
-  const Detailtheme(
-      {super.key, required this.theme_id, required this.theme_name});
+  const Detailtheme({
+    super.key,
+    required this.theme_id,
+    required this.theme_name,
+    required this.background_img,
+  });
 
   @override
   State<Detailtheme> createState() => _DetailThemeState();
@@ -67,7 +72,7 @@ class _DetailThemeState extends State<Detailtheme> {
             return Stack(
               children: [
                 Image.asset(
-                  "assets/theme/${snapshot.data![0].background_img}",
+                  "assets/theme/${widget.background_img}",
                   width: 393.w,
                   height: 778.h,
                   fit: BoxFit.fill,

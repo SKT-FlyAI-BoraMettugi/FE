@@ -134,6 +134,8 @@ class _ThemeTabState extends State<ThemeTab> {
                                 builder: (context) => Detailtheme(
                                   theme_id: snapshot.data![index].theme_id,
                                   theme_name: snapshot.data![index].theme_name,
+                                  background_img:
+                                      snapshot.data![index].background_img,
                                 ),
                               ),
                             );
