@@ -10,12 +10,14 @@ class ProblemScreen extends StatefulWidget {
   final int questionId;
   final String theme_name;
   final int themeID;
+  final int userId;
 
   const ProblemScreen({
     super.key,
     required this.questionId,
     required this.theme_name,
     required this.themeID,
+    required this.userId,
   });
 
   @override
@@ -147,11 +149,13 @@ class _ProblemScreenState extends State<ProblemScreen> {
                       ),
                       ResultTab(
                         questionID: widget.questionId,
+                        userId: widget.userId,
                       ),
                       DiscussionTab(
                         questionID: widget.questionId,
                         theme_name: widget.theme_name,
                         themeID: widget.themeID,
+                        userId: widget.userId,
                       ),
                     ],
                   ),

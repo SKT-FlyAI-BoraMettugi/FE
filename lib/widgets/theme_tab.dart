@@ -9,7 +9,11 @@ import 'package:FE/widgets/detailtheme.dart';
 import 'package:http/http.dart' as http;
 
 class ThemeTab extends StatefulWidget {
-  const ThemeTab({super.key});
+  final int userId;
+  const ThemeTab({
+    super.key,
+    required this.userId,
+  });
 
   @override
   State<ThemeTab> createState() => _ThemeTabState();
@@ -136,6 +140,7 @@ class _ThemeTabState extends State<ThemeTab> {
                                   theme_name: snapshot.data![index].theme_name,
                                   background_img:
                                       snapshot.data![index].background_img,
+                                  userId: widget.userId,
                                 ),
                               ),
                             );

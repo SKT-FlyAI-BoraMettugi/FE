@@ -7,7 +7,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 
 class ExamTab extends StatefulWidget {
-  const ExamTab({super.key});
+  final int userId;
+  const ExamTab({
+    super.key,
+    required this.userId,
+  });
 
   @override
   State<ExamTab> createState() => _ExamTabState();
@@ -36,7 +40,7 @@ class _ExamTabState extends State<ExamTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/1',
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/${widget.userId}',
         ),
         body: utf8.encode(
           jsonEncode({

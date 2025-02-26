@@ -4,7 +4,6 @@ class GetuserModel {
       login_channel,
       profile_image,
       nickname,
-      social_token,
       updated_date;
 
   GetuserModel.fromJson(Map<String, dynamic> json)
@@ -15,6 +14,5 @@ class GetuserModel {
         login_channel = json['login_channel'],
         profile_image = json['profile_image'],
         nickname = json['nickname'],
-        social_token = json['social_token'],
         updated_date = json['updated_date'];
 }

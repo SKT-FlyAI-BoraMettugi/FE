@@ -11,12 +11,14 @@ class Detailtheme extends StatefulWidget {
   final int theme_id;
   final String theme_name;
   final String background_img;
+  final int userId;
 
   const Detailtheme({
     super.key,
     required this.theme_id,
     required this.theme_name,
     required this.background_img,
+    required this.userId,
   });
 
   @override
@@ -37,7 +39,7 @@ class _DetailThemeState extends State<Detailtheme> {
   Future<List<GetthemedetailModel>> detail() async {
     List<GetthemedetailModel> detailInstances = [];
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/theme/${widget.theme_id}/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/theme/${widget.theme_id}/${widget.userId}'));
     if (response.statusCode == 200) {
       final decodedbody = utf8.decode(response.bodyBytes);
       final List<dynamic> details = jsonDecode(decodedbody);
@@ -174,6 +176,7 @@ class _DetailThemeState extends State<Detailtheme> {
                                         theme_name:
                                             snapshot.data![index].theme_name,
                                         themeID: snapshot.data![index].theme_id,
+                                        userId: widget.userId,
                                       ),
                                     ),
                                   );

@@ -12,12 +12,14 @@ class DiscussionTab extends StatefulWidget {
   final int questionID;
   final int themeID;
   final String theme_name;
+  final int userId;
 
   const DiscussionTab({
     super.key,
     required this.questionID,
     required this.theme_name,
     required this.themeID,
+    required this.userId,
   });
 
   @override
@@ -67,7 +69,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   Future<List<GetdiscussionModel>> getuserlikediscussion() async {
     List<GetdiscussionModel> discussionlikeInstances = [];
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/${widget.userId}'));
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);
       final List<dynamic> discussionlikes = jsonDecode(decodedbody);
@@ -85,7 +87,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   Future<List<GetcommentModel>> getuserlikecomment() async {
     List<GetcommentModel> commentlikeInstances = [];
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/like/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/like/${widget.userId}'));
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);
       final List<dynamic> commentlikes = jsonDecode(decodedbody);
@@ -101,7 +103,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   Future<String> getbadge() async {
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/badges/1/${widget.themeID}'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/badges/${widget.userId}/${widget.themeID}'));
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);
       return decodedbody;
@@ -112,7 +114,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   Future<int> result() async {
     final response = await http.get(
       Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/1/${widget.questionID}'),
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/${widget.userId}/${widget.questionID}'),
     );
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);
@@ -132,7 +134,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   Future<int> discussionlike(int discussionId) async {
     final response = await http.patch(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/$discussionId/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/like/$discussionId/${widget.userId}'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> discussionlikes = jsonDecode(response.body);
       final GetlikeModel discussionlike =
@@ -146,7 +148,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
 
   Future<int> commentlike(int commentId) async {
     final response = await http.patch(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/like/$commentId/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/like/$commentId/${widget.userId}'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> commentlikes = jsonDecode(response.body);
       final GetlikeModel commentlike = GetlikeModel.fromJson(commentlikes);
@@ -172,6 +174,13 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     fetchscore();
   }
 
+  @override
+  void dispose() {
+    fetchData();
+    fetchscore();
+    super.dispose();
+  }
+
   Future<void> fetchData() async {
     discussions = await getdiscussion();
     var likedDiscussionList = await getuserlikediscussion();
@@ -187,7 +196,6 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     for (var comment in likedCommentList) {
       commentLikes[comment.comment_id] = comment.like;
     }
-
     setState(() {});
   }
 
@@ -195,7 +203,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     if (discussionController.text.isEmpty) return;
     await http.post(
       Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/1/${widget.questionID}'),
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/discussion/${widget.userId}/${widget.questionID}'),
       body: utf8.encode(jsonEncode({"content": discussionController.text})),
     );
     discussionController.clear();
@@ -206,7 +214,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     if (commentControllers[discussionId]!.text.isEmpty) return;
     await http.post(
       Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/1/$discussionId'),
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/comment/${widget.userId}/$discussionId'),
       body: utf8.encode(
           jsonEncode({"content": commentControllers[discussionId]!.text})),
     );

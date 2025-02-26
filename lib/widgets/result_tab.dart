@@ -10,8 +10,13 @@ import 'package:http/http.dart' as http;
 
 class ResultTab extends StatefulWidget {
   final int questionID;
+  final int userId;
 
-  const ResultTab({super.key, required this.questionID});
+  const ResultTab({
+    super.key,
+    required this.questionID,
+    required this.userId,
+  });
 
   @override
   State<ResultTab> createState() => _ResultTabState();
@@ -21,7 +26,7 @@ class _ResultTabState extends State<ResultTab> {
   Future<GetresultModel> result() async {
     final response = await http.get(
       Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/1/${widget.questionID}'),
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/${widget.userId}/${widget.questionID}'),
     );
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);

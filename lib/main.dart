@@ -39,7 +39,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final int userId;
+  const MainPage({
+    super.key,
+    required this.userId,
+  });
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -123,9 +127,9 @@ class _MainPageState extends State<MainPage> {
     return exitApp ?? false;
   }
 
-  Future<GetuserModel> userinfo() async {
-    final response = await http.get(
-        Uri.parse('http://nolly.ap-northeast-2.elasticbeanstalk.com/user/1'));
+  Future<GetuserModel> userinfo(int userId) async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/$userId'));
     if (response.statusCode == 200) {
       final decodedbody = utf8.decode(response.bodyBytes);
       final Map<String, dynamic> infos = jsonDecode(decodedbody);
@@ -135,9 +139,9 @@ class _MainPageState extends State<MainPage> {
     throw Error();
   }
 
-  Future<GetrankingModel> userrank() async {
+  Future<GetrankingModel> userrank(int userId) async {
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/ranking/1'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/ranking/$userId'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> ranks = jsonDecode(response.body);
       GetrankingModel rank = GetrankingModel.fromJson(ranks);
@@ -148,8 +152,8 @@ class _MainPageState extends State<MainPage> {
 
   Future<Map<String, dynamic>> fetchData() async {
     final responses = await Future.wait([
-      userinfo(),
-      userrank(),
+      userinfo(widget.userId),
+      userrank(widget.userId),
     ]);
 
     return {
@@ -221,6 +225,7 @@ class _MainPageState extends State<MainPage> {
                                 score: snapshot.data!['info'].score,
                                 nickname: snapshot.data!['info'].nickname,
                                 index: index,
+                                userId: widget.userId,
                               ),
                             );
                           },
@@ -289,6 +294,7 @@ class _MainPageState extends State<MainPage> {
     required int score,
     required String nickname,
     required int index,
+    required int userId,
   }) {
     switch (index) {
       case 0:
@@ -305,9 +311,13 @@ class _MainPageState extends State<MainPage> {
           ),
         );
       case 1:
-        return ThemeTab();
+        return ThemeTab(
+          userId: userId,
+        );
       case 2:
-        return ExamTab();
+        return ExamTab(
+          userId: userId,
+        );
       case 3:
         return ShopTab();
       case 4:
