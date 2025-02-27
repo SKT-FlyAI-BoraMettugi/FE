@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:FE/widgets/getquestion_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,7 +8,9 @@ import 'package:http/http.dart' as http;
 
 class QuestionTab extends StatefulWidget {
   final int questionID;
-  const QuestionTab({super.key, required this.questionID});
+  final int userId;
+  const QuestionTab(
+      {super.key, required this.questionID, required this.userId});
 
   @override
   State<QuestionTab> createState() => _QuestionTabState();
@@ -26,7 +31,7 @@ class _QuestionTabState extends State<QuestionTab> {
     try {
       final response = await http.post(
         Uri.parse(
-          'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/${widget.questionID}',
+          'http://nolly.ap-northeast-2.elasticbeanstalk.com/answer/${widget.userId}/${widget.questionID}',
         ),
       );
 
@@ -114,6 +119,18 @@ class _QuestionTabState extends State<QuestionTab> {
     }
   }
 
+  Future<GetquestionModel> question() async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/question/${widget.questionID}'));
+    if (response.statusCode == 200) {
+      final String decodedbody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> questions = jsonDecode(decodedbody);
+      GetquestionModel question = GetquestionModel.fromJson(questions);
+      return question;
+    }
+    throw Error();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -121,10 +138,84 @@ class _QuestionTabState extends State<QuestionTab> {
         children: [
           Container(
             width: 383.w,
-            height: 600.h,
             decoration: BoxDecoration(
               color: Color(0xFFF9F8FF),
               borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: FutureBuilder(
+              future: question(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      "문제 불러오기를 실패했습니다.",
+                      style: TextStyle(
+                        fontSize: 20.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.h,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "난이도 : ${snapshot.data!.level}",
+                              style: TextStyle(
+                                fontSize: 15.h,
+                                fontFamily: 'SUITE',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      Image.asset(
+                        'assets/problem/${snapshot.data!.image_url}',
+                        width: 330.w,
+                        height: 180.h,
+                      ),
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.h,
+                        ),
+                        child: SizedBox(
+                          width: 350.w,
+                          child: Text(
+                            snapshot.data!.description,
+                            style: TextStyle(
+                              fontSize: 15.h,
+                              fontFamily: 'SUITE',
+                              fontWeight: FontWeight.w400,
+                              height: 3.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
           SizedBox(
@@ -164,6 +255,7 @@ class _QuestionTabState extends State<QuestionTab> {
                 controller: myanswer,
                 showCursor: true,
                 maxLines: 10,
+                style: TextStyle(),
                 decoration: InputDecoration(
                   hintText: '답변을 작성해주세요.',
                   hintStyle: TextStyle(

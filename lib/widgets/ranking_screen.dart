@@ -60,6 +60,7 @@ Future<List<Map<String, dynamic>>> fetchRankingWithUserInfo() async {
       "score": rankings[index].score,
       "userId": rankings[index].user_id,
       "userName": userInfos[index].nickname,
+      "characterImg": userInfos[index].character_id,
     };
   });
 }
@@ -226,7 +227,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                   ? Row(
                                       children: [
                                         SizedBox(
-                                          width: 12.w,
+                                          width: 25.w,
                                           height: 80.h,
                                         ),
                                         Stack(
@@ -241,7 +242,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                               ),
                                             ),
                                             SizedBox(
-                                              width: 90.w,
+                                              width: 80.w,
                                             )
                                           ],
                                         ),
@@ -251,7 +252,8 @@ class _RankingScreenState extends State<RankingScreen> {
                                               size: Size(60.h, 60.h),
                                               painter: CirclePainter(
                                                 radius: 30.h,
-                                                color: Color(0xFFEAF2FF),
+                                                color: Color(0xFFEAF2FF)
+                                                    .withValues(alpha: 0),
                                                 centerX: 30.h,
                                                 centerY: 30.h,
                                               ),
@@ -260,7 +262,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                               left: 12.h,
                                               top: 12.h,
                                               child: Image.asset(
-                                                'assets/main/rabbit.png',
+                                                'assets/character/${snapshot.data![index]['characterImg']}.png',
                                                 width: 36.h,
                                                 height: 36.h,
                                               ),
@@ -273,7 +275,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                         Stack(
                                           children: [
                                             SizedBox(
-                                              width: 150.w,
+                                              width: 145.w,
                                             ),
                                             Text(
                                               "${snapshot.data![index]['userName']}",
@@ -298,7 +300,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                   : Row(
                                       children: [
                                         SizedBox(
-                                          width: 12.w,
+                                          width: 25.w,
                                           height: 80.h,
                                         ),
                                         Stack(
@@ -312,7 +314,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                               ),
                                             ),
                                             SizedBox(
-                                              width: 90.w,
+                                              width: 80.w,
                                             ),
                                           ],
                                         ),
@@ -322,7 +324,10 @@ class _RankingScreenState extends State<RankingScreen> {
                                               size: Size(60.h, 60.h),
                                               painter: CirclePainter(
                                                 radius: 30.h,
-                                                color: Color(0xFFEAF2FF),
+                                                color: Color(0xFFEAF2FF)
+                                                    .withValues(
+                                                  alpha: 0,
+                                                ),
                                                 centerX: 30.h,
                                                 centerY: 30.h,
                                               ),
@@ -331,7 +336,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                               left: 12.h,
                                               top: 12.h,
                                               child: Image.asset(
-                                                'assets/main/rabbit.png',
+                                                'assets/character/${snapshot.data![index]["characterImg"]}.png',
                                                 width: 36.h,
                                                 height: 36.h,
                                               ),
@@ -344,7 +349,7 @@ class _RankingScreenState extends State<RankingScreen> {
                                         Stack(
                                           children: [
                                             SizedBox(
-                                              width: 150.w,
+                                              width: 145.w,
                                             ),
                                             Text(
                                               "${snapshot.data![index]['userName']}",

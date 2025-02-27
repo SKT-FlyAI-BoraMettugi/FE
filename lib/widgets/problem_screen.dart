@@ -5,17 +5,18 @@ import 'package:FE/widgets/result_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 
 class ProblemScreen extends StatefulWidget {
+  final int character_id;
   final int questionId;
-  final String theme_name;
   final int themeID;
   final int userId;
 
   const ProblemScreen({
     super.key,
+    required this.character_id,
     required this.questionId,
-    required this.theme_name,
     required this.themeID,
     required this.userId,
   });
@@ -146,14 +147,15 @@ class _ProblemScreenState extends State<ProblemScreen> {
                     children: [
                       QuestionTab(
                         questionID: widget.questionId,
+                        userId: widget.userId,
                       ),
                       ResultTab(
                         questionID: widget.questionId,
                         userId: widget.userId,
                       ),
                       DiscussionTab(
+                        character_id: widget.character_id,
                         questionID: widget.questionId,
-                        theme_name: widget.theme_name,
                         themeID: widget.themeID,
                         userId: widget.userId,
                       ),

@@ -8,6 +8,7 @@ import 'package:FE/widgets/problem_screen.dart';
 import 'package:http/http.dart' as http;
 
 class Detailtheme extends StatefulWidget {
+  final int character_id;
   final int theme_id;
   final String theme_name;
   final String background_img;
@@ -15,6 +16,7 @@ class Detailtheme extends StatefulWidget {
 
   const Detailtheme({
     super.key,
+    required this.character_id,
     required this.theme_id,
     required this.theme_name,
     required this.background_img,
@@ -39,7 +41,7 @@ class _DetailThemeState extends State<Detailtheme> {
   Future<List<GetthemedetailModel>> detail() async {
     List<GetthemedetailModel> detailInstances = [];
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/theme/${widget.theme_id}/${widget.userId}'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/theme/${widget.userId}/${widget.theme_id}'));
     if (response.statusCode == 200) {
       final decodedbody = utf8.decode(response.bodyBytes);
       final List<dynamic> details = jsonDecode(decodedbody);
@@ -96,7 +98,7 @@ class _DetailThemeState extends State<Detailtheme> {
                           child: Icon(
                             Icons.arrow_back_ios_new,
                             size: 24.h,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                         SizedBox(
@@ -113,7 +115,7 @@ class _DetailThemeState extends State<Detailtheme> {
                           child: Icon(
                             Icons.notifications_none,
                             size: 24.h,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -125,12 +127,12 @@ class _DetailThemeState extends State<Detailtheme> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "${widget.theme_name} 월드",
+                          widget.theme_name,
                           style: TextStyle(
                             fontSize: 20.h,
                             fontFamily: 'SUITE',
                             fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         )
                       ],
@@ -144,7 +146,7 @@ class _DetailThemeState extends State<Detailtheme> {
                         width: 383.w,
                         height: 1.h,
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
@@ -172,9 +174,9 @@ class _DetailThemeState extends State<Detailtheme> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ProblemScreen(
-                                        questionId: snapshot.data![index].stage,
-                                        theme_name:
-                                            snapshot.data![index].theme_name,
+                                        character_id: widget.character_id,
+                                        questionId:
+                                            snapshot.data![index].question_id,
                                         themeID: snapshot.data![index].theme_id,
                                         userId: widget.userId,
                                       ),
@@ -209,55 +211,87 @@ class _DetailThemeState extends State<Detailtheme> {
                                 ),
                               );
                             } else if (index < 8) {
-                              return Container(
-                                width: 75.h,
-                                height: 75.h,
-                                decoration: BoxDecoration(
-                                  color: (snapshot
-                                              .data![index].mid_fail_color ==
-                                          "#FFFFFF")
-                                      ? getColorFromApiResponse(
-                                          snapshot.data![index].mid_succ_color)
-                                      : getColorFromApiResponse(
-                                          snapshot.data![index].mid_fail_color),
-                                  borderRadius: BorderRadius.circular(75.h),
-                                  border: Border.all(
-                                      color: Color(0xFF142AF2), width: 2),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "${snapshot.data![index].stage}",
-                                    style: TextStyle(
-                                      fontSize: 20.h,
-                                      fontFamily: 'SUITE',
-                                      fontWeight: FontWeight.w600,
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProblemScreen(
+                                        character_id: widget.character_id,
+                                        questionId:
+                                            snapshot.data![index].question_id,
+                                        themeID: snapshot.data![index].theme_id,
+                                        userId: widget.userId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 75.h,
+                                  height: 75.h,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        (snapshot.data![index].mid_fail_color ==
+                                                "#FFFFFF")
+                                            ? getColorFromApiResponse(snapshot
+                                                .data![index].mid_succ_color)
+                                            : getColorFromApiResponse(snapshot
+                                                .data![index].mid_fail_color),
+                                    borderRadius: BorderRadius.circular(75.h),
+                                    border: Border.all(
+                                        color: Color(0xFF142AF2), width: 2),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${snapshot.data![index].stage}",
+                                      style: TextStyle(
+                                        fontSize: 20.h,
+                                        fontFamily: 'SUITE',
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),
                               );
                             } else {
-                              return Container(
-                                width: 75.h,
-                                height: 75.h,
-                                decoration: BoxDecoration(
-                                  color: (snapshot
-                                              .data![index].high_fail_color ==
-                                          "#FFFFFF")
-                                      ? getColorFromApiResponse(
-                                          snapshot.data![index].high_succ_color)
-                                      : getColorFromApiResponse(snapshot
-                                          .data![index].high_fail_color),
-                                  borderRadius: BorderRadius.circular(75.h),
-                                  border: Border.all(
-                                      color: Color(0xFF142AF2), width: 2),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "${snapshot.data![index].stage}",
-                                    style: TextStyle(
-                                      fontSize: 20.h,
-                                      fontFamily: 'SUITE',
-                                      fontWeight: FontWeight.w600,
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProblemScreen(
+                                        character_id: widget.character_id,
+                                        questionId:
+                                            snapshot.data![index].question_id,
+                                        themeID: snapshot.data![index].theme_id,
+                                        userId: widget.userId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 75.h,
+                                  height: 75.h,
+                                  decoration: BoxDecoration(
+                                    color: (snapshot
+                                                .data![index].high_fail_color ==
+                                            "#FFFFFF")
+                                        ? getColorFromApiResponse(snapshot
+                                            .data![index].high_succ_color)
+                                        : getColorFromApiResponse(snapshot
+                                            .data![index].high_fail_color),
+                                    borderRadius: BorderRadius.circular(75.h),
+                                    border: Border.all(
+                                        color: Color(0xFF142AF2), width: 2),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${snapshot.data![index].stage}",
+                                      style: TextStyle(
+                                        fontSize: 20.h,
+                                        fontFamily: 'SUITE',
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),

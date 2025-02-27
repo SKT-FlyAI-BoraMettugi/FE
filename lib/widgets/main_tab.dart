@@ -1,5 +1,6 @@
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:FE/widgets/ranking_screen.dart';
+import 'package:FE/widgets/weekchallenge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -7,12 +8,16 @@ class MainTab extends StatefulWidget {
   int userrank;
   int score;
   String nickname;
+  int characterId;
+  int userId;
 
   MainTab({
     super.key,
     required this.userrank,
     required this.score,
     required this.nickname,
+    required this.characterId,
+    required this.userId,
   });
 
   @override
@@ -147,7 +152,7 @@ class _MainTabState extends State<MainTab> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/main/rabbit.png',
+                  'assets/character/${widget.characterId}.png',
                   width: 103.w,
                   height: 103.h,
                 ),
@@ -382,7 +387,7 @@ class _MainTabState extends State<MainTab> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "이번 주 테마 : 우주",
+                    "이번 주 테마 : 생물",
                     style: TextStyle(
                       fontSize: 15.h,
                       fontFamily: 'SUITE',
@@ -407,6 +412,37 @@ class _MainTabState extends State<MainTab> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20.h,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => Weekchallenge(
+                        character_id: widget.characterId,
+                        userId: widget.userId,
+                      ),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Hero(
+                  tag: "challenge",
+                  child: Image.asset(
+                    'assets/problem/week_challenge.png',
+                    width: 400.h,
+                    height: 200.h,
+                  ),
+                ),
+              )
             ],
           ),
         )

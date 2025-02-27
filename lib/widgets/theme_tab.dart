@@ -10,8 +10,10 @@ import 'package:http/http.dart' as http;
 
 class ThemeTab extends StatefulWidget {
   final int userId;
+  final int character_id;
   const ThemeTab({
     super.key,
+    required this.character_id,
     required this.userId,
   });
 
@@ -136,6 +138,7 @@ class _ThemeTabState extends State<ThemeTab> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Detailtheme(
+                                  character_id: widget.character_id,
                                   theme_id: snapshot.data![index].theme_id,
                                   theme_name: snapshot.data![index].theme_name,
                                   background_img:
@@ -156,13 +159,26 @@ class _ThemeTabState extends State<ThemeTab> {
                                 SizedBox(
                                   width: 25.w,
                                 ),
-                                CustomPaint(
-                                    size: Size(60.h, 60.h),
-                                    painter: CirclePainter(
-                                        radius: 30.h,
-                                        color: Color(0xFFA6A6A6),
-                                        centerX: 30.h,
-                                        centerY: 30.h)),
+                                Stack(
+                                  children: [
+                                    CustomPaint(
+                                        size: Size(60.h, 60.h),
+                                        painter: CirclePainter(
+                                            radius: 30.h,
+                                            color: Color(0xFFA6A6A6),
+                                            centerX: 30.h,
+                                            centerY: 30.h)),
+                                    Positioned(
+                                      top: 12.h,
+                                      left: 12.h,
+                                      child: Image.asset(
+                                        'assets/theme/${snapshot.data![index].profile_img}',
+                                        width: 36.h,
+                                        height: 36.h,
+                                      ),
+                                    )
+                                  ],
+                                ),
                                 SizedBox(
                                   width: 21.w,
                                 ),

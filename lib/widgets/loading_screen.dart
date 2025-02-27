@@ -34,15 +34,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
       builder: (context, child) {
         return MaterialApp(
           home: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.yellow.shade100,
             body: Center(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 420.h,
-                  ),
-                  Text("Hello")
-                ],
+              child: Image.asset(
+                'assets/login/logo.png',
+                width: 400.h,
+                height: 500.h,
               ),
             ),
           ),

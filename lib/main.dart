@@ -17,7 +17,11 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(nativeAppKey: "3896bb79a2e48c79bb9f994f3feb9482");
-  runApp(MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // 세로 모드 고정
+  ]).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -221,12 +225,13 @@ class _MainPageState extends State<MainPage> {
                           onGenerateRoute: (routeSettings) {
                             return MaterialPageRoute(
                               builder: (context) => _getScreen(
-                                rank: snapshot.data!['rank'].rank,
-                                score: snapshot.data!['info'].score,
-                                nickname: snapshot.data!['info'].nickname,
-                                index: index,
-                                userId: widget.userId,
-                              ),
+                                  rank: snapshot.data!['rank'].rank,
+                                  score: snapshot.data!['info'].score,
+                                  nickname: snapshot.data!['info'].nickname,
+                                  index: index,
+                                  userId: widget.userId,
+                                  characterId:
+                                      snapshot.data!['info'].character_id),
                             );
                           },
                         ),
@@ -295,6 +300,7 @@ class _MainPageState extends State<MainPage> {
     required String nickname,
     required int index,
     required int userId,
+    required int characterId,
   }) {
     switch (index) {
       case 0:
@@ -308,10 +314,13 @@ class _MainPageState extends State<MainPage> {
             userrank: rank,
             score: score,
             nickname: nickname,
+            characterId: characterId,
+            userId: userId,
           ),
         );
       case 1:
         return ThemeTab(
+          character_id: characterId,
           userId: userId,
         );
       case 2:
@@ -319,10 +328,14 @@ class _MainPageState extends State<MainPage> {
           userId: userId,
         );
       case 3:
-        return ShopTab();
+        return ShopTab(
+          characterId: characterId,
+        );
       case 4:
         return MyPageTab(
           nickname: nickname,
+          userId: userId,
+          characterId: characterId,
         );
       default:
         return Center(child: Text("Error"));

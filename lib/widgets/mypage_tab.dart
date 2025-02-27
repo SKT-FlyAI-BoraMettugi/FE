@@ -6,10 +6,22 @@ import 'package:FE/widgets/circle_painter.dart';
 import 'package:FE/widgets/info_change.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
-class MyPageTab extends StatelessWidget {
+class MyPageTab extends StatefulWidget {
   String nickname;
-  MyPageTab({super.key, required this.nickname});
+  int userId;
+  int characterId;
+  MyPageTab({
+    super.key,
+    required this.nickname,
+    required this.userId,
+    required this.characterId,
+  });
 
+  @override
+  State<MyPageTab> createState() => _MyPageTabState();
+}
+
+class _MyPageTabState extends State<MyPageTab> {
   void kakaologout() async {
     try {
       await UserApi.instance.logout();
@@ -79,7 +91,7 @@ class MyPageTab extends StatelessWidget {
                         left: 6.h,
                         top: 6.h,
                         child: Image.asset(
-                          'assets/main/rabbit.png',
+                          'assets/character/${widget.characterId}.png',
                           width: 48.h,
                           height: 48.h,
                         ),
@@ -95,7 +107,7 @@ class MyPageTab extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            nickname,
+                            widget.nickname,
                             style: TextStyle(
                               fontFamily: 'SUITE',
                               fontWeight: FontWeight.w600,
@@ -127,8 +139,11 @@ class MyPageTab extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                InfoChange(nickname: nickname)),
+                            builder: (context) => InfoChange(
+                                  nickname: widget.nickname,
+                                  userId: widget.userId,
+                                  characterId: widget.characterId,
+                                )),
                       );
                     },
                     child: Icon(

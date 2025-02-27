@@ -9,9 +9,13 @@ import 'package:http/http.dart' as http;
 
 class InfoChange extends StatefulWidget {
   String nickname;
+  int userId;
+  int characterId;
   InfoChange({
     super.key,
     required this.nickname,
+    required this.userId,
+    required this.characterId,
   });
 
   @override
@@ -24,8 +28,9 @@ class _InfoChangeState extends State<InfoChange> {
   Future<void> modifyname() async {
     final response = await http.patch(
         Uri.parse(
-            'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/nickname/1'),
-        body: utf8.encode(jsonEncode({"user_id": 1, "nickname": name.text})));
+            'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/nickname/${widget.userId}'),
+        body: utf8.encode(
+            jsonEncode({"user_id": widget.userId, "nickname": name.text})));
   }
 
   @override
@@ -103,7 +108,7 @@ class _InfoChangeState extends State<InfoChange> {
                           left: 6.h,
                           top: 6.h,
                           child: Image.asset(
-                            'assets/main/rabbit.png',
+                            'assets/character/${widget.characterId}.png',
                             width: 48.h,
                             height: 48.h,
                           ),

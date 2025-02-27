@@ -70,7 +70,9 @@ class _ExamTabState extends State<ExamTab> {
               ),
             ),
             content: Text(
-              response.statusCode == 200 ? "문제 출제 완료" : "응답 오류",
+              response.statusCode == 200
+                  ? "문제 출제 완료\n관리자의 검토 후에 문제가 등록됩니다."
+                  : "응답 오류",
               style: TextStyle(
                 fontSize: 15.h,
                 fontFamily: 'SUITE',

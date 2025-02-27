@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/elipse_painter.dart';
 
 class ShopTab extends StatefulWidget {
+  final int characterId;
   const ShopTab({
     super.key,
+    required this.characterId,
   });
 
   @override
@@ -100,10 +102,10 @@ class _ShopTabState extends State<ShopTab> {
               painter: EllipsePainter(),
             ),
             Positioned(
-              top: 0.h,
+              top: 30.h,
               left: 99.w,
               child: Image.asset(
-                'assets/main/rabbit.png',
+                'assets/character/${widget.characterId}.png',
                 width: 195.w,
                 height: 195.h,
               ),

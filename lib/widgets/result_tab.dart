@@ -47,7 +47,7 @@ class _ResultTabState extends State<ResultTab> {
         } else if (snapshot.hasError) {
           return Center(
             child: Text(
-              "결과가 없습니다.",
+              "채점 결과가 없습니다.",
               style: TextStyle(
                 fontSize: 20.h,
                 fontFamily: 'SUITE',

@@ -31,6 +31,8 @@ flutter:
     - assets/images/
     - assets/login/
     - assets/badge/
+    - assets/character/
+    - assets/problem/
   
   fonts:
     - family: SUITE

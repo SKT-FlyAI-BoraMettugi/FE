@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:FE/widgets/getcomment_model.dart';
 import 'package:FE/widgets/getlike_model.dart';
 import 'package:FE/widgets/getresult_model.dart';
+import 'package:FE/widgets/getuser_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/getdiscussion_model.dart';
 import 'package:flutter/material.dart';
@@ -9,15 +10,15 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class DiscussionTab extends StatefulWidget {
+  final int character_id;
   final int questionID;
   final int themeID;
-  final String theme_name;
   final int userId;
 
   const DiscussionTab({
     super.key,
+    required this.character_id,
     required this.questionID,
-    required this.theme_name,
     required this.themeID,
     required this.userId,
   });
@@ -101,9 +102,9 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     throw Error();
   }
 
-  Future<String> getbadge() async {
+  Future<String> getbadge(int userId) async {
     final response = await http.get(Uri.parse(
-        'http://nolly.ap-northeast-2.elasticbeanstalk.com/badges/${widget.userId}/${widget.themeID}'));
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/badges/$userId/${widget.themeID}'));
     if (response.statusCode == 200) {
       String decodedbody = utf8.decode(response.bodyBytes);
       return decodedbody;
@@ -174,13 +175,6 @@ class _DiscusstionTabState extends State<DiscussionTab> {
     fetchscore();
   }
 
-  @override
-  void dispose() {
-    fetchData();
-    fetchscore();
-    super.dispose();
-  }
-
   Future<void> fetchData() async {
     discussions = await getdiscussion();
     var likedDiscussionList = await getuserlikediscussion();
@@ -224,32 +218,100 @@ class _DiscusstionTabState extends State<DiscussionTab> {
   }
 
   Future<void> toggleDiscussionLike(int discussionId) async {
-    int updatedLike = await discussionlike(discussionId);
+    bool wasLiked = likedDiscussions.contains(discussionId);
+    int previousLikes = discussionLikes[discussionId] ?? 0;
+
+    // Optimistic UI 업데이트
     setState(() {
-      discussionLikes[discussionId] = updatedLike;
-      if (updatedLike == 1) {
-        likedDiscussions.add(discussionId);
-      } else {
+      if (wasLiked) {
         likedDiscussions.remove(discussionId);
+        discussionLikes[discussionId] = previousLikes - 1;
+      } else {
+        likedDiscussions.add(discussionId);
+        discussionLikes[discussionId] = previousLikes + 1;
       }
+      likedDiscussions = Set.from(likedDiscussions);
     });
+
+    // 서버 요청
+    try {
+      int updatedLike = await discussionlike(discussionId);
+
+      // 서버 응답이 예상과 다르면 롤백
+      if ((wasLiked && updatedLike != previousLikes - 1) ||
+          (!wasLiked && updatedLike != previousLikes + 1)) {
+        setState(() {
+          if (wasLiked) {
+            likedDiscussions.add(discussionId);
+            discussionLikes[discussionId] = previousLikes;
+          } else {
+            likedDiscussions.remove(discussionId);
+            discussionLikes[discussionId] = previousLikes;
+          }
+          likedDiscussions = Set.from(likedDiscussions);
+        });
+      }
+    } catch (e) {
+      // 네트워크 오류 등으로 요청 실패 시 롤백
+      setState(() {
+        if (wasLiked) {
+          likedDiscussions.add(discussionId);
+          discussionLikes[discussionId] = previousLikes;
+        } else {
+          likedDiscussions.remove(discussionId);
+          discussionLikes[discussionId] = previousLikes;
+        }
+        likedDiscussions = Set.from(likedDiscussions);
+      });
+    }
   }
 
   Future<void> toggleCommentLike(int commentId) async {
+    bool wasLiked = likedComments.contains(commentId);
+    int previousLikes = commentLikes[commentId] ?? 0;
+
+    // Optimistic UI 업데이트
+    setState(() {
+      if (wasLiked) {
+        likedComments.remove(commentId);
+        commentLikes[commentId] = previousLikes - 1;
+      } else {
+        likedComments.add(commentId);
+        commentLikes[commentId] = previousLikes + 1;
+      }
+      likedComments = Set.from(likedComments);
+    });
+
+    // 서버 요청
     try {
       int updatedLike = await commentlike(commentId);
 
+      // 서버 응답이 예상과 다르면 롤백
+      if ((wasLiked && updatedLike != previousLikes - 1) ||
+          (!wasLiked && updatedLike != previousLikes + 1)) {
+        setState(() {
+          if (wasLiked) {
+            likedComments.add(commentId);
+            commentLikes[commentId] = previousLikes;
+          } else {
+            likedComments.remove(commentId);
+            commentLikes[commentId] = previousLikes;
+          }
+          likedComments = Set.from(likedComments);
+        });
+      }
+    } catch (e) {
+      // 네트워크 오류 등으로 요청 실패 시 롤백
       setState(() {
-        commentLikes[commentId] = updatedLike;
-
-        if (updatedLike > 0) {
+        if (wasLiked) {
           likedComments.add(commentId);
+          commentLikes[commentId] = previousLikes;
         } else {
           likedComments.remove(commentId);
+          commentLikes[commentId] = previousLikes;
         }
+        likedComments = Set.from(likedComments);
       });
-    } catch (e) {
-      print("❌ 답글 좋아요 처리 중 오류 발생: $e");
     }
   }
 
@@ -274,6 +336,18 @@ class _DiscusstionTabState extends State<DiscussionTab> {
         print("❌ 답글 불러오기 실패: $e");
       }
     }
+  }
+
+  Future<GetuserModel> users(int userId) async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/$userId'));
+    if (response.statusCode == 200) {
+      final String decodedbody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> userinfos = jsonDecode(decodedbody);
+      GetuserModel userinfo = GetuserModel.fromJson(userinfos);
+      return userinfo;
+    }
+    throw Error();
   }
 
   String timeAgo(String dateTimeString) {
@@ -333,7 +407,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                             leading: Stack(
                               children: [
                                 Image.asset(
-                                  'assets/main/rabbit.png',
+                                  'assets/character/${discussion.user_id}.png',
                                   width: 42.h,
                                   height: 42.h,
                                 ),
@@ -341,7 +415,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                   top: 22.h,
                                   left: 24.h,
                                   child: FutureBuilder(
-                                    future: getbadge(),
+                                    future: getbadge(discussion.user_id),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
@@ -387,7 +461,7 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                               ),
                             ),
                             subtitle: Text(
-                              timeAgo(discussion.created_date),
+                              "${discussion.user_id}  ${timeAgo(discussion.created_date)}",
                               style: TextStyle(
                                 fontSize: 10.h,
                                 fontFamily: 'SUITE',
@@ -460,7 +534,8 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                                     top: 22.h,
                                                     left: 24.h,
                                                     child: FutureBuilder(
-                                                      future: getbadge(),
+                                                      future: getbadge(
+                                                          discussion.user_id),
                                                       builder:
                                                           (context, snapshot) {
                                                         if (snapshot
@@ -506,8 +581,8 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                                                 ],
                                               ),
                                               title: Text(comment.content),
-                                              subtitle: Text(timeAgo(
-                                                  comment.created_date)),
+                                              subtitle: Text(
+                                                  "${comment.comment_id}  ${timeAgo(comment.created_date)}"),
                                               trailing: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
@@ -596,47 +671,71 @@ class _DiscusstionTabState extends State<DiscussionTab> {
                   },
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: 50.w,
-                  top: 10.h,
-                ),
-                child: Container(
-                  width: 300.w,
-                  height: 46.h,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20.r),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 15.w,
                   ),
-                  child: Row(
+                  Stack(
                     children: [
-                      SizedBox(
-                        width: 10.w,
-                      ),
-                      Expanded(
-                        child: TextField(
-                          minLines: 1,
-                          maxLines: null,
-                          controller: discussionController,
-                          decoration: InputDecoration(
-                            hintText: "토론을 생성하세요",
-                            hintStyle: TextStyle(
-                              fontSize: 15.h,
-                              fontFamily: 'SUITE',
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFFA6A6A6),
-                            ),
-                            border: InputBorder.none,
+                      Container(
+                        width: 60.h,
+                        height: 60.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0),
+                          borderRadius: BorderRadius.circular(42.h),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(6.h),
+                          child: Image.asset(
+                            'assets/character/${widget.character_id}.png',
+                            width: 36.h,
+                            height: 36.h,
                           ),
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: postdiscussion,
-                      ),
                     ],
                   ),
-                ),
+                  SizedBox(
+                    width: 5.w,
+                  ),
+                  Container(
+                    width: 300.w,
+                    height: 46.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 10.w,
+                        ),
+                        Expanded(
+                          child: TextField(
+                            minLines: 1,
+                            maxLines: null,
+                            controller: discussionController,
+                            decoration: InputDecoration(
+                              hintText: "토론을 생성하세요",
+                              hintStyle: TextStyle(
+                                fontSize: 15.h,
+                                fontFamily: 'SUITE',
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFFA6A6A6),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: postdiscussion,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
