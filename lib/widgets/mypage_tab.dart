@@ -4,11 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/circle_painter.dart';
 import 'package:FE/widgets/info_change.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
-class MyPageTab extends StatelessWidget {
-  const MyPageTab({
+class MyPageTab extends StatefulWidget {
+  String nickname;
+  int userId;
+  int characterId;
+  MyPageTab({
     super.key,
+    required this.nickname,
+    required this.userId,
+    required this.characterId,
   });
+
+  @override
+  State<MyPageTab> createState() => _MyPageTabState();
+}
+
+class _MyPageTabState extends State<MyPageTab> {
+  void kakaologout() async {
+    try {
+      await UserApi.instance.logout();
+      print('로그아웃 성공, SDK에서 토큰 삭제');
+    } catch (error) {
+      print('로그아웃 실패, SDK에서 토큰 삭제 $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +91,7 @@ class MyPageTab extends StatelessWidget {
                         left: 6.h,
                         top: 6.h,
                         child: Image.asset(
-                          'assets/main/rabbit.png',
+                          'assets/character/${widget.characterId}.png',
                           width: 48.h,
                           height: 48.h,
                         ),
@@ -86,7 +107,7 @@ class MyPageTab extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "이동현",
+                            widget.nickname,
                             style: TextStyle(
                               fontFamily: 'SUITE',
                               fontWeight: FontWeight.w600,
@@ -117,7 +138,12 @@ class MyPageTab extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => InfoChange()),
+                        MaterialPageRoute(
+                            builder: (context) => InfoChange(
+                                  nickname: widget.nickname,
+                                  userId: widget.userId,
+                                  characterId: widget.characterId,
+                                )),
                       );
                     },
                     child: Icon(
@@ -176,6 +202,7 @@ class MyPageTab extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
+                          kakaologout();
                           Navigator.of(context, rootNavigator: true)
                               .pushReplacement(
                             MaterialPageRoute(

@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:FE/main.dart';
+import 'package:FE/widgets/getloginstat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,8 +16,77 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController id = TextEditingController();
-  final TextEditingController pw = TextEditingController();
+  User? user;
+  GetloginstatModel? stat;
+
+  Future<GetloginstatModel> loginstat(
+      String nickname, int kakaoId, String profileImg) async {
+    final response = await http.patch(
+      Uri.parse('http://nolly.ap-northeast-2.elasticbeanstalk.com/user/login'),
+      body: utf8.encode(
+        jsonEncode(
+          {
+            "nickname": nickname,
+            "profile_img": profileImg,
+            "kakao_id": kakaoId,
+          },
+        ),
+      ),
+    );
+    if (response.statusCode == 200) {
+      final String decodedbody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> stats = jsonDecode(decodedbody);
+      final GetloginstatModel stat = GetloginstatModel.fromJson(stats);
+      return stat;
+    }
+    throw Error();
+  }
+
+  void loginkakao() async {
+    try {
+      await UserApi.instance.loginWithKakaoAccount();
+      print('카카오계정으로 로그인 성공');
+    } catch (error) {
+      print('카카오계정으로 로그인 실패 $error');
+    }
+    try {
+      user = await UserApi.instance.me();
+      print('사용자 정보 요청 성공'
+          '\n회원번호: ${user!.id}'
+          '\n닉네임: ${user!.kakaoAccount?.profile?.nickname}'
+          '\n프로필 사진: ${user!.kakaoAccount?.profile?.profileImageUrl}');
+    } catch (error) {
+      print('사용자 정보 요청 실패 $error');
+      return;
+    }
+    try {
+      AccessTokenInfo tokenInfo = await UserApi.instance.accessTokenInfo();
+      print('토큰 정보 보기 성공'
+          '\n회원정보: ${tokenInfo.id}'
+          '\n만료시간: ${tokenInfo.expiresIn} 초');
+    } catch (error) {
+      print('토큰 정보 보기 실패 $error');
+    }
+    if (user != null) {
+      try {
+        stat = await loginstat(
+          user!.kakaoAccount!.profile!.nickname!,
+          user!.id,
+          user!.kakaoAccount!.profile!.profileImageUrl!,
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MainPage(
+              userId: stat!.user_id,
+            ),
+          ),
+        );
+      } catch (error) {
+        print('유저 정보 불러오기 실패');
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -21,8 +95,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    id.clear();
-    pw.clear();
     super.dispose();
   }
 
@@ -60,105 +132,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 20.h,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 240.h,
-                          height: 140.h,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF9F8FF),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15.h,
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.w),
-                              child: Column(
-                                children: [
-                                  TextField(
-                                    controller: id,
-                                    showCursor: true,
-                                    style: TextStyle(
-                                      fontSize: 15.h,
-                                      fontFamily: 'SUITE',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                        hintText: "아이디",
-                                        hintStyle: TextStyle(
-                                          fontSize: 15.h,
-                                          fontFamily: 'SUITE',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFFA6A6A6),
-                                        )),
-                                  ),
-                                  TextField(
-                                    controller: pw,
-                                    showCursor: true,
-                                    style: TextStyle(
-                                      fontSize: 15.h,
-                                      fontFamily: 'SUITE',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    decoration: InputDecoration(
-                                        hintText: "비밀번호",
-                                        hintStyle: TextStyle(
-                                          fontSize: 15.h,
-                                          fontFamily: 'SUITE',
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFFA6A6A6),
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    GestureDetector(
+                      onTap: () {
+                        loginkakao();
+                      },
+                      child: Image.asset(
+                        'assets/login/kakao_login_large_narrow.png',
+                        width: 200.w,
+                        height: 40.h,
+                      ),
                     ),
                     SizedBox(
                       height: 20.h,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MainPage()),
-                            );
-                            id.clear();
-                            pw.clear();
-                          },
-                          child: Container(
-                            width: 120.w,
-                            height: 40.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "로그인",
-                                  style: TextStyle(
-                                    fontSize: 20.h,
-                                    fontFamily: 'SUITE',
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
                   ],
                 ),
               ),

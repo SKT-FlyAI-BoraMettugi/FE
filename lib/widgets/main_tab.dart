@@ -1,16 +1,30 @@
-import 'dart:ffi';
-
 import 'package:FE/widgets/notification_screen.dart';
 import 'package:FE/widgets/ranking_screen.dart';
+import 'package:FE/widgets/weekchallenge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:FE/widgets/elipse_painter.dart';
 
-class MainTab extends StatelessWidget {
-  const MainTab({
+class MainTab extends StatefulWidget {
+  int userrank;
+  int score;
+  String nickname;
+  int characterId;
+  int userId;
+
+  MainTab({
     super.key,
+    required this.userrank,
+    required this.score,
+    required this.nickname,
+    required this.characterId,
+    required this.userId,
   });
 
+  @override
+  State<MainTab> createState() => _MainTabState();
+}
+
+class _MainTabState extends State<MainTab> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -33,7 +47,7 @@ class MainTab extends StatelessWidget {
               width: 11.w,
             ),
             Text(
-              "3등",
+              "${widget.userrank}등",
               style: TextStyle(
                 letterSpacing: 0.5,
                 fontSize: 15.h,
@@ -138,7 +152,7 @@ class MainTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/main/rabbit.png',
+                  'assets/character/${widget.characterId}.png',
                   width: 103.w,
                   height: 103.h,
                 ),
@@ -156,7 +170,7 @@ class MainTab extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "이동현",
+                        widget.nickname,
                         style: TextStyle(
                           letterSpacing: 0.5,
                           fontSize: 15.h,
@@ -202,7 +216,7 @@ class MainTab extends StatelessWidget {
                         width: 164.w - 27.h,
                       ),
                       Text(
-                        "1위",
+                        "${widget.userrank}등",
                         style: TextStyle(
                           letterSpacing: 0.5,
                           fontSize: 15.h,
@@ -233,7 +247,7 @@ class MainTab extends StatelessWidget {
                         width: 164.w - 58.h,
                       ),
                       Text(
-                        "781",
+                        "${widget.score}",
                         style: TextStyle(
                           letterSpacing: 0.5,
                           fontSize: 15.h,
@@ -373,7 +387,7 @@ class MainTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "이번 주 테마 : 우주",
+                    "이번 주 테마 : 생물",
                     style: TextStyle(
                       fontSize: 15.h,
                       fontFamily: 'SUITE',
@@ -398,6 +412,37 @@ class MainTab extends StatelessWidget {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20.h,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => Weekchallenge(
+                        character_id: widget.characterId,
+                        userId: widget.userId,
+                      ),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Hero(
+                  tag: "challenge",
+                  child: Image.asset(
+                    'assets/problem/week_challenge.png',
+                    width: 400.h,
+                    height: 200.h,
+                  ),
+                ),
+              )
             ],
           ),
         )

@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:FE/widgets/exam_tab.dart';
+import 'package:FE/widgets/getranking_model.dart';
+import 'package:FE/widgets/getuser_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,9 +11,17 @@ import 'package:FE/widgets/main_tab.dart';
 import 'package:FE/widgets/mypage_tab.dart';
 import 'package:FE/widgets/shop_tab.dart';
 import 'package:FE/widgets/theme_tab.dart';
+import 'package:http/http.dart' as http;
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  KakaoSdk.init(nativeAppKey: "3896bb79a2e48c79bb9f994f3feb9482");
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // 세로 모드 고정
+  ]).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -31,13 +43,18 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final int userId;
+  const MainPage({
+    super.key,
+    required this.userId,
+  });
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
+  Future<Map<String, dynamic>>? totalData;
   // 페이지 이동시에도 bottomnavigationbar 유지
   final List<GlobalKey<NavigatorState>> _navigatorKeys =
       List.generate(5, (index) => GlobalKey<NavigatorState>());
@@ -69,16 +86,44 @@ class _MainPageState extends State<MainPage> {
     bool? exitApp = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("앱 종료"),
-        content: const Text("앱을 종료하시겠습니까?"),
+        title: Text(
+          "앱 종료",
+          style: TextStyle(
+            fontSize: 20.h,
+            fontFamily: 'SUITE',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          "앱을 종료하시겠습니까?",
+          style: TextStyle(
+            fontSize: 15.h,
+            fontFamily: 'SUITE',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text("아니요"),
+            child: Text(
+              "아니요",
+              style: TextStyle(
+                fontSize: 15.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text("예"),
+            child: Text(
+              "예",
+              style: TextStyle(
+                fontSize: 15.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
         ],
       ),
@@ -86,10 +131,51 @@ class _MainPageState extends State<MainPage> {
     return exitApp ?? false;
   }
 
+  Future<GetuserModel> userinfo(int userId) async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/user/$userId'));
+    if (response.statusCode == 200) {
+      final decodedbody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> infos = jsonDecode(decodedbody);
+      GetuserModel info = GetuserModel.fromJson(infos);
+      return info;
+    }
+    throw Error();
+  }
+
+  Future<GetrankingModel> userrank(int userId) async {
+    final response = await http.get(Uri.parse(
+        'http://nolly.ap-northeast-2.elasticbeanstalk.com/ranking/$userId'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> ranks = jsonDecode(response.body);
+      GetrankingModel rank = GetrankingModel.fromJson(ranks);
+      return rank;
+    }
+    throw Error();
+  }
+
+  Future<Map<String, dynamic>> fetchData() async {
+    final responses = await Future.wait([
+      userinfo(widget.userId),
+      userrank(widget.userId),
+    ]);
+
+    return {
+      'info': responses[0],
+      'rank': responses[1],
+    };
+  }
+
   @override
   void initState() {
     super.initState();
+    totalData = fetchData();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -102,87 +188,155 @@ class _MainPageState extends State<MainPage> {
             FocusScope.of(context).unfocus();
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
           },
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            backgroundColor: Color(0xFFEEEDF1),
-            body: Stack(
-              children: List.generate(5, (index) {
-                return Offstage(
-                  offstage: _currentIndex != index,
-                  child: Navigator(
-                    key: _navigatorKeys[index],
-                    onGenerateRoute: (routeSettings) {
-                      return MaterialPageRoute(
-                        builder: (context) => _getScreen(index),
-                      );
-                    },
+          child: FutureBuilder(
+            future: totalData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Scaffold(
+                  backgroundColor: Color(0xFFEEEDF1),
+                  body: Center(
+                    child: CircularProgressIndicator(),
                   ),
                 );
-              }),
-            ),
-            bottomNavigationBar: SizedBox(
-              height: 74.h,
-              child: BottomNavigationBar(
-                backgroundColor: Colors.white,
-                currentIndex: _currentIndex,
-                onTap: _onTabTapped,
-                selectedItemColor: Colors.black,
-                unselectedItemColor: Color(0xFFA6A6A6),
-                selectedLabelStyle: TextStyle(
-                  fontSize: 15.h,
-                  fontFamily: 'SUITE',
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: 15.h,
-                  fontFamily: 'SUITE',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFFA6A6A6),
-                ),
-                type: BottomNavigationBarType.fixed,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.storefront, size: 36.h),
-                    label: "메인",
+              } else if (snapshot.hasError) {
+                return Scaffold(
+                  backgroundColor: Color(0xFFEEEDF1),
+                  body: Center(
+                    child: Text(
+                      "정보 불러오기에 실패했습니다.",
+                      style: TextStyle(
+                        fontSize: 20.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.assistant_photo_outlined, size: 36.h),
-                    label: "테마",
+                );
+              } else {
+                return Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  backgroundColor: Color(0xFFEEEDF1),
+                  body: Stack(
+                    children: List.generate(5, (index) {
+                      return Offstage(
+                        offstage: _currentIndex != index,
+                        child: Navigator(
+                          key: _navigatorKeys[index],
+                          onGenerateRoute: (routeSettings) {
+                            return MaterialPageRoute(
+                              builder: (context) => _getScreen(
+                                  rank: snapshot.data!['rank'].rank,
+                                  score: snapshot.data!['info'].score,
+                                  nickname: snapshot.data!['info'].nickname,
+                                  index: index,
+                                  userId: widget.userId,
+                                  characterId:
+                                      snapshot.data!['info'].character_id),
+                            );
+                          },
+                        ),
+                      );
+                    }),
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.design_services_outlined, size: 36.h),
-                    label: "출제",
+                  bottomNavigationBar: SizedBox(
+                    height: 74.h,
+                    child: BottomNavigationBar(
+                      backgroundColor: Colors.white,
+                      currentIndex: _currentIndex,
+                      onTap: _onTabTapped,
+                      selectedItemColor: Colors.black,
+                      unselectedItemColor: Color(0xFFA6A6A6),
+                      selectedLabelStyle: TextStyle(
+                        fontSize: 15.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                      unselectedLabelStyle: TextStyle(
+                        fontSize: 15.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFA6A6A6),
+                      ),
+                      type: BottomNavigationBarType.fixed,
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.storefront, size: 36.h),
+                          label: "메인",
+                        ),
+                        BottomNavigationBarItem(
+                          icon:
+                              Icon(Icons.assistant_photo_outlined, size: 36.h),
+                          label: "테마",
+                        ),
+                        BottomNavigationBarItem(
+                          icon:
+                              Icon(Icons.design_services_outlined, size: 36.h),
+                          label: "출제",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.auto_fix_high_outlined, size: 36.h),
+                          label: "상점",
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.menu, size: 36.h),
+                          label: "마이 페이지",
+                        ),
+                      ],
+                    ),
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.auto_fix_high_outlined, size: 36.h),
-                    label: "상점",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.menu, size: 36.h),
-                    label: "마이 페이지",
-                  ),
-                ],
-              ),
-            ),
+                );
+              }
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _getScreen(int index) {
+  Widget _getScreen({
+    required int rank,
+    required int score,
+    required String nickname,
+    required int index,
+    required int userId,
+    required int characterId,
+  }) {
     switch (index) {
       case 0:
-        return MainTab();
+        return GestureDetector(
+          onDoubleTap: () {
+            setState(() {
+              totalData = fetchData();
+            });
+          },
+          child: MainTab(
+            userrank: rank,
+            score: score,
+            nickname: nickname,
+            characterId: characterId,
+            userId: userId,
+          ),
+        );
       case 1:
-        return ThemeTab();
+        return ThemeTab(
+          character_id: characterId,
+          userId: userId,
+        );
       case 2:
-        return ExamTab();
+        return ExamTab(
+          userId: userId,
+        );
       case 3:
-        return ShopTab();
+        return ShopTab(
+          characterId: characterId,
+        );
       case 4:
-        return MyPageTab();
+        return MyPageTab(
+          nickname: nickname,
+          userId: userId,
+          characterId: characterId,
+        );
       default:
         return Center(child: Text("Error"));
     }

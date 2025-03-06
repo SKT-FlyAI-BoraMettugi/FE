@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:FE/widgets/elipse_painter.dart';
 
 class ShopTab extends StatefulWidget {
+  final int characterId;
   const ShopTab({
     super.key,
+    required this.characterId,
   });
 
   @override
@@ -64,7 +66,9 @@ class _ShopTabState extends State<ShopTab> {
             Text(
               "3000",
               style: TextStyle(
-                fontSize: 17.sp,
+                fontSize: 20.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(
@@ -80,7 +84,11 @@ class _ShopTabState extends State<ShopTab> {
             ),
             Text(
               "0",
-              style: TextStyle(fontSize: 17.sp),
+              style: TextStyle(
+                fontSize: 20.h,
+                fontFamily: 'SUITE',
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -94,10 +102,10 @@ class _ShopTabState extends State<ShopTab> {
               painter: EllipsePainter(),
             ),
             Positioned(
-              top: 0.h,
+              top: 30.h,
               left: 99.w,
               child: Image.asset(
-                'assets/main/rabbit.png',
+                'assets/character/${widget.characterId}.png',
                 width: 195.w,
                 height: 195.h,
               ),
@@ -132,11 +140,13 @@ class _ShopTabState extends State<ShopTab> {
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.only(top: 4.h, left: 38.w, right: 38.w),
+                    padding: EdgeInsets.only(top: 4.h, left: 40.w, right: 38.w),
                     child: Text(
                       "소품",
                       style: TextStyle(
-                        fontSize: 17.sp,
+                        fontSize: 15.h,
+                        fontFamily: 'SUITE',
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
@@ -154,14 +164,14 @@ class _ShopTabState extends State<ShopTab> {
                       padding: EdgeInsets.only(
                         left: 18.w,
                         right: 17.w,
-                        top: 0.h,
+                        top: 20.h,
                       ),
                       child: GridView.builder(
                         shrinkWrap: true,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
-                          crossAxisSpacing: 20.w,
-                          mainAxisSpacing: 17.h,
+                          crossAxisSpacing: 52.h,
+                          mainAxisSpacing: 52.h,
                           childAspectRatio: 1,
                         ),
                         itemCount: clothes.length,
@@ -169,7 +179,6 @@ class _ShopTabState extends State<ShopTab> {
                           return GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
-                              print(1);
                               if (isPurchased[index] == false) {
                                 setState(() {
                                   isPurchased[index] = true;
@@ -191,7 +200,7 @@ class _ShopTabState extends State<ShopTab> {
                               }
                             },
                             child: Container(
-                              width: 72.w,
+                              width: 72.h,
                               height: 72.h,
                               decoration: BoxDecoration(
                                 color: isPurchased[index]
@@ -208,20 +217,20 @@ class _ShopTabState extends State<ShopTab> {
                               ),
                               child: isPurchased[index]
                                   ? Padding(
-                                      padding: EdgeInsets.all(1.w),
+                                      padding: EdgeInsets.all(1.h),
                                       child: Image.asset(
                                         clothes[index],
-                                        width: 48.w,
+                                        width: 48.h,
                                         height: 48.h,
                                       ),
                                     )
                                   : Padding(
-                                      padding: EdgeInsets.all(12.w),
+                                      padding: EdgeInsets.all(12.h),
                                       child: Stack(
                                         children: [
                                           Image.asset(
                                             clothes[index],
-                                            width: 48.w,
+                                            width: 48.h,
                                             height: 48.h,
                                           ),
                                           Positioned(
@@ -229,7 +238,7 @@ class _ShopTabState extends State<ShopTab> {
                                             left: 5.w,
                                             child: Image.asset(
                                               'assets/images/locker.png',
-                                              width: 36.w,
+                                              width: 36.h,
                                               height: 36.h,
                                             ),
                                           ),

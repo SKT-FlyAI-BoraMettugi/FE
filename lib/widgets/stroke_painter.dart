@@ -4,9 +4,9 @@ import 'dart:math';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StrokePainter extends CustomPainter {
-  final List<int> score;
+  List<int> score;
 
-  StrokePainter({required this.score});
+  StrokePainter({this.score = const [0, 0, 0, 0, 0]});
 
   @override
   void paint(Canvas canvas, Size size) {
